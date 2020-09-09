@@ -1,0 +1,12 @@
+package oop.ex6.classification;
+
+public enum VariableType {
+
+    INT("int");
+
+    private final String type;
+
+    VariableType(final String type) {this.type = type;}
+
+    public String getType(){return type;}
+}
