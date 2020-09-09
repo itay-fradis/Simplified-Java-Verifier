@@ -14,11 +14,9 @@ public class Classifier {
      */
     private Classifier(){};
 
-    private void gg(){};
-
     /**
      * return line type for a given line
-     * @param line
+     * @param line - line to classify
      * @return - lineType
      */
     public static LineType LineClassify(String line) {

@@ -5,6 +5,8 @@ public enum LineType {
 
     RETURN("^return;$");
 
+    NEW_VARIABLE("")
+
 
     private final String regexPattern;
 
