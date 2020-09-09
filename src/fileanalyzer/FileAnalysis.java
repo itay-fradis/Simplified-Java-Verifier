@@ -1,4 +1,4 @@
-package oop.ex6.fileanalyzer;
+package fileanalyzer;
 
 import oop.ex6.component.Component;
 

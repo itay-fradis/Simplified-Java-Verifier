@@ -1,4 +1,4 @@
-package oop.ex6.component;
+package component;
 
 public class Component {
 

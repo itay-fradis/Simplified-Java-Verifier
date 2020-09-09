@@ -1,4 +1,4 @@
-package oop.ex6.fileanalyzer;
+package fileanalyzer;
 
 import oop.ex6.classification.Classifier;
 import oop.ex6.classification.LineType;

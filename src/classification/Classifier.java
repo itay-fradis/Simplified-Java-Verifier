@@ -1,4 +1,4 @@
-package oop.ex6.classification;
+package classification;
 
 /**
  * class to classify lines
