@@ -34,6 +34,7 @@ public class Sjavac {
             System.out.println(IO_ERROR_CODE);
             System.out.println(SJAVA_FILE_WARNING);
         }
+        int x = 1;
 
 
     }
