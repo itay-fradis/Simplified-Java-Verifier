@@ -1,6 +1,6 @@
 package oop.ex6.classification;
 
-import java.util.regex.Matcher;
+import java.util.regex.*;
 import java.util.regex.Pattern;
 
 /**
@@ -41,9 +41,14 @@ public class LineClassification {
         private LineType type;
         private Matcher matcher;
 
-        public LineDetails(LineType t, Matcher m){
-            matcher = m;
-            type = t;
+        /**
+         *
+         * @param type
+         * @param matcher
+         */
+        public LineDetails(LineType type, Matcher matcher){
+            this.matcher = matcher;
+            this.type = type;
         }
 
         public LineType getType() {
