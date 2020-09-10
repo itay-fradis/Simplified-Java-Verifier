@@ -27,6 +27,7 @@ public class Component {
         this.isFinal = isFinal;
         this.type = type;
         this.value = value;
+        int x = 1;
     }
 
     /**
