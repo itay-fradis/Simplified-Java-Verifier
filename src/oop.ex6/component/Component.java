@@ -1,7 +1,5 @@
 package oop.ex6.component;
 
-import oop.ex6.classification.VariableType;
-
 /**
  * an abstract class represents a component
  */
@@ -22,12 +20,13 @@ public class Component {
      * @param name  - name
      * @param isFinal - is final
      */
-    public Component(VariableType type, String name, boolean isFinal, String value){
+    public Component(String type, String name, String isFinal, String value){
+        if (isFinal != null)
+            this.isFinal = true;
+        this.type = VariableType.valueOf(type);
         this.name = name;
-        this.isFinal = isFinal;
-        this.type = type;
-        this.value = value;
-        int x = 1;
+        value = value;
+
     }
 
     /**
