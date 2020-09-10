@@ -1,24 +1,33 @@
 package oop.ex6.component;
 
+import oop.ex6.classification.VariableType;
+
 /**
  * an abstract class represents a component
  */
 public class Component {
     /** type of component */
-    private final VariableType type = null;
+    private VariableType type = null;
     /** name of component */
     private final String name;
     /** is component final*/
-    private final boolean isFinal = false;
+    private boolean isFinal = false;
+    /***/
+    private String value;
+
 
     /**
      * constructor for component
-     * @param t - type
-     * @param n  - name
-     * @param f - is final
+     * @param type - type
+     * @param name  - name
+     * @param isFinal - is final
      */
-    public Component(String t, String n, String f){
-        name = n;
+    public Component(VariableType type, String name, boolean isFinal, String value){
+        this.name = name;
+        this.isFinal = isFinal;
+        this.type = type;
+        this.value = value;
+        int x = 1;
     }
 
     /**
