@@ -37,12 +37,15 @@ public class LineClassification {
         return LineType.BAD_LINE;
     }
 
+    /**
+     * holds line objects - Matcher and LineType
+     */
     public static class LineDetails{
         private LineType type;
         private Matcher matcher;
 
         /**
-         * holds line objects - Matcher and LineType
+         * constructor
          * @param type line type
          * @param matcher matcher object.
          */
