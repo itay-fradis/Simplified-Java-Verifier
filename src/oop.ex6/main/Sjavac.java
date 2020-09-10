@@ -1,4 +1,12 @@
-package main;
+package oop.ex6.main;
+
+import oop.ex6.component.ComponentAnalyzer;
+import oop.ex6.fileanalyzer.FileAnalysis;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Sjavac {
 
@@ -24,7 +32,7 @@ public class Sjavac {
     private static final int IO_ERROR_CODE = 2;
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws FileNotFoundException {
         if (args.length != NUM_OF_ARGS){
             System.err.println(WRONG_NUM_OF_ARGS);
             System.exit(1);
@@ -34,7 +42,6 @@ public class Sjavac {
             System.out.println(IO_ERROR_CODE);
             System.out.println(SJAVA_FILE_WARNING);
         }
-
-
+        FileAnalysis.Analysis(fileName);
     }
 }

@@ -1,4 +1,4 @@
-package fileanalyzer;
+package oop.ex6.fileanalyzer;
 
 import oop.ex6.component.Component;
 
@@ -9,12 +9,11 @@ import java.io.IOException;
 
 public class FileAnalysis {
 
-    private static FileAnalysis self = new FileAnalysis();
 
     private FileAnalysis() {
     }
 
-    public void Analysis(File toRead) {
+    public static void Analysis(String toRead) {
         try (BufferedReader reader = new BufferedReader(new FileReader(toRead))){
 
             ScopeAnalysis.Analyze(null, reader);
