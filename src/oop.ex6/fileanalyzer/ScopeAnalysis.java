@@ -35,7 +35,12 @@ public class ScopeAnalysis {
      */
     private Scope[] scopes;
 
-
+    /**
+     * analyze lines in a scope
+     * @param s - list of previos scopes
+     * @param reader - reader of file
+     * @throws IOException - when cannot read from file
+     */
     public static void Analyze(Scope[] s, BufferedReader reader) throws IOException {
         String line;
         while ((line = reader.readLine()) != null){

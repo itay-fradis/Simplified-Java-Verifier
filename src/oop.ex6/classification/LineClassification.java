@@ -12,7 +12,9 @@ public class LineClassification {
      */
     private static final LineType[] generalTypes = new LineType[]{LineType.NORMAL_LINE,
             LineType.CLOSED_SCOPE_LINE, LineType.OPEN_SCOPE_LINE};
-
+    /**
+     * types of line end on semi colon
+     */
     private static final LineType[] SEMICOLON_TYPES = new LineType[]{
             LineType.RETURN, LineType.NEW_VARIABLE};
 
