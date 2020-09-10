@@ -28,8 +28,7 @@ public class ComponentAnalyzer {
         for(LineType t: LineType.values()){
             Matcher m = Pattern.compile(t.getRegexPattern()).matcher(line);
             if (m.matches()){
-                Component c = new Component(m.group("variableType"), m.group("variableName"),
-                        m.group("final"));
+               return null;
             }
         }
         return null;

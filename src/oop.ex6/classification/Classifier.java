@@ -20,5 +20,6 @@ public class Classifier {
      * @return - lineType
      */
     public static LineType LineClassify(String line) {
+        return null;
     }
 }
