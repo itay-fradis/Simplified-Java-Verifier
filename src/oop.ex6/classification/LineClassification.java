@@ -10,13 +10,13 @@ public class LineClassification {
     /**
      * general type of lines
      */
-    private static final LineType[] generalTypes = new LineType[]{LineType.NORMAL_LINE,
+    private static final LineType[] generalTypes = new LineType[]{LineType.COMMENT, LineType.NORMAL_LINE,
             LineType.CLOSED_SCOPE_LINE, LineType.OPEN_SCOPE_LINE};
     /**
      * types of line end on semi colon
      */
     private static final LineType[] SEMICOLON_TYPES = new LineType[]{
-            LineType.RETURN, LineType.NEW_VARIABLE};
+            LineType.RETURN, LineType.NEW_VARIABLE, LineType.VARIABLE_ASSIGNMENT};
 
     /**
      * default constructor
@@ -37,19 +37,37 @@ public class LineClassification {
         return LineType.BAD_LINE;
     }
 
+    public static class LineDetails{
+        private LineType type;
+        private Matcher matcher;
+
+        public LineDetails(LineType t, Matcher m){
+            matcher = m;
+            type = t;
+        }
+
+        public LineType getType() {
+            return type;
+        }
+
+        public Matcher getMatcher() {
+            return matcher;
+        }
+    }
+
     /**
      * classify a line from a list of possible types
      * @param line - line to classify
      * @param types - types of lines possible
      * @return - type
      */
-    private static LineType classify(String line, LineType[] types){
+    private static LineDetails classify(String line, LineType[] types){
         for (LineType l : types){
             Matcher m = Pattern.compile(l.getRegexPattern()).matcher(line);
             if (m.matches())
-                return l;
+                return new LineDetails(l, m);
         }
-        return LineType.BAD_LINE;
+        return new LineDetails(LineType.BAD_LINE, null);
 
     }
 
@@ -58,7 +76,7 @@ public class LineClassification {
      * @param line - line to classify
      * @return - type
      */
-    public static LineType SemiColonClassify(String line){
+    public static LineDetails SemiColonClassify(String line){
         return classify(line, SEMICOLON_TYPES);
     }
 

@@ -19,14 +19,15 @@ public class FileAnalysis {
      * analyse a file and handle exceptions if there is any
      * @param toRead - file name
      */
-    public static void Analysis(String toRead) {
+    public static int Analysis(String toRead) {
         try (BufferedReader reader = new BufferedReader(new FileReader(toRead))){
 
             ScopeAnalysis.Analyze(null, reader);
-
+            return 0;
         }
         catch (IOException e){
             e.printStackTrace();
+            return -1;
         }
     }
 
