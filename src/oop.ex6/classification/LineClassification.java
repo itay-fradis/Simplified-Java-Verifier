@@ -21,7 +21,7 @@ public class LineClassification {
     /**
      * default constructor
      */
-    private LineClassification(){};
+    private LineClassification(){}
 
     /**
      * general classification
@@ -42,9 +42,9 @@ public class LineClassification {
         private Matcher matcher;
 
         /**
-         *
-         * @param type
-         * @param matcher
+         * holds line objects - Matcher and LineType
+         * @param type line type
+         * @param matcher matcher object.
          */
         public LineDetails(LineType type, Matcher matcher){
             this.matcher = matcher;
