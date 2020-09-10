@@ -23,9 +23,9 @@ public class Component {
     public Component(String type, String name, String isFinal, String value){
         if (isFinal != null)
             this.isFinal = true;
-        this.type = VariableType.valueOf(type);
+        this.type = VariableType.getType(type);
         this.name = name;
-        value = value;
+        this.value = value;
 
     }
 
