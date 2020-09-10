@@ -57,8 +57,6 @@ public class ScopeAnalysis {
         String line;
         while ((line = reader.readLine()) != null){
             LineType type = LineClassification.generalClassify(line);
-            Matcher m;
-
             switch (type){
                 case NORMAL_LINE:
                     LineClassification.LineDetails d = LineClassification.SemiColonClassify(line);
