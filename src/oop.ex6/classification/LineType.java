@@ -2,11 +2,18 @@ package oop.ex6.classification;
 
 public enum LineType {
 
+    NORMAL_LINE(";$"),
 
-    RETURN("^return;$");
+    OPEN_SCOPE_LINE("{$"),
 
-    NEW_VARIABLE("")
+    CLOSED_SCOPE_LINE("}$"),
 
+    RETURN("^return;$"),
+
+    BAD_LINE(""),
+
+    NEW_VARIABLE("((?<final>^final\\s+)|(^))(?<variableType>[a-zA-z][a-z]+)\\s+" +
+                "(?<variableName>[_a-zA-z]\\w*)(;|\\s*=\\s*(?<variableValue>\\w*;))");
 
     private final String regexPattern;
 
