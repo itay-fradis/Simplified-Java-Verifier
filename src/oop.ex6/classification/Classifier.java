@@ -1,5 +1,10 @@
 package oop.ex6.classification;
 
+import oop.ex6.component.VariableType;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * class to classify lines
  */
@@ -21,5 +26,23 @@ public class Classifier {
      */
     public static LineType LineClassify(String line) {
         return null;
+    }
+
+    /**
+     * @param value given value.
+     * @return the type which fits to the given value.
+     */
+    public static VariableType classifyValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        for (VariableType varType : VariableType.values()) {
+            Matcher match = Pattern.compile(varType.getTypeRegex()).matcher(value);
+            if (match.matches()) {
+                return varType;
+            }
+        }
+        return null;
+
     }
 }

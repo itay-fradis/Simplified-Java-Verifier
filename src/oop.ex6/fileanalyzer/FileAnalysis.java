@@ -29,6 +29,9 @@ public class FileAnalysis {
             e.printStackTrace();
             return 1;
         }
+        catch (Exception e){
+            return 1;
+        }
     }
 
 }

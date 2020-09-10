@@ -3,6 +3,7 @@ package oop.ex6.fileanalyzer;
 import oop.ex6.classification.LineClassification;
 import oop.ex6.classification.LineType;
 import oop.ex6.component.Component;
+import oop.ex6.component.ComponentFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,17 +54,20 @@ public class ScopeAnalysis {
      * @param reader - reader of file
      * @throws IOException - when cannot read from file
      */
-    public static void Analyze(Scope[] s, BufferedReader reader) throws IOException {
+    public static void Analyze(Scope[] s, BufferedReader reader) throws Exception {
         String line;
         while ((line = reader.readLine()) != null){
             LineType type = LineClassification.generalClassify(line);
             switch (type){
                 case NORMAL_LINE:
-                    LineClassification.LineDetails d = LineClassification.SemiColonClassify(line);
-                    switch (d.getType()){
+                    LineClassification.LineDetails detailsL = LineClassification.SemiColonClassify(line);
+                    switch (detailsL.getType()){
                         case NEW_VARIABLE:
-                            new Component(d.getMatcher().group(VARIABLE_TYPE),d.getMatcher().group(VARIABLE_NAME)
-                                    , d.getMatcher().group(isFinal), d.getMatcher().group(VARIABLE_VALUE));
+                            ComponentFactory.addVariable(detailsL);
+                            new Component(detailsL.getMatcher().group(VARIABLE_TYPE),
+                                    detailsL.getMatcher().group(VARIABLE_NAME)
+                                    , detailsL.getMatcher().group(isFinal),
+                                    detailsL.getMatcher().group(VARIABLE_VALUE));
                             break;
                     }
                     break;

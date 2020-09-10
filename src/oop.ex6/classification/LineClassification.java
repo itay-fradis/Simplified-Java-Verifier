@@ -41,8 +41,8 @@ public class LineClassification {
      * holds line objects - Matcher and LineType
      */
     public static class LineDetails{
-        private LineType type;
-        private Matcher matcher;
+        private final LineType type;
+        private final Matcher matcher;
 
         /**
          * constructor
@@ -70,10 +70,10 @@ public class LineClassification {
      * @return - type
      */
     private static LineDetails classify(String line, LineType[] types){
-        for (LineType l : types){
-            Matcher m = Pattern.compile(l.getRegexPattern()).matcher(line);
-            if (m.matches())
-                return new LineDetails(l, m);
+        for (LineType lineType : types){
+            Matcher matcher = Pattern.compile(lineType.getRegexPattern()).matcher(line);
+            if (matcher.matches())
+                return new LineDetails(lineType, matcher);
         }
         return new LineDetails(LineType.BAD_LINE, null);
 
