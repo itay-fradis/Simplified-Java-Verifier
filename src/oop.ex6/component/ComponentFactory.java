@@ -63,11 +63,11 @@ public class ComponentFactory {
                 throw new VariableDeclarationException();
             }
 
-            if (type.equals(DOUBLE) && !valueType.equals(DOUBLE)){
+            if (type.equals(DOUBLE) && !valueType.equals(DOUBLE) && !valueType.equals(INT)){
                 throw new VariableDeclarationException();
             }
 
-            if (type.equals(STRING) && !valueType.equals(STRING)){
+            if (type.equals(STRING) && !valueType.equals(STRING) && !valueType.equals(CHAR)){
                 throw new VariableDeclarationException();
             }
 

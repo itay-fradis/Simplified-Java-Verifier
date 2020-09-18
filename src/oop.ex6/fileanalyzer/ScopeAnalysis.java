@@ -84,6 +84,7 @@ public class ScopeAnalysis {
     private static void parseNormalLine(String line) throws BadLineFormatException {
         // remove semi colon
         line = line.substring(0, line.length() - 1);
+        line = line.trim();
         LineDetails detailsL = LineClassification.SemiColonClassify(line);
         switch (detailsL.getType()){
             case NEW_VARIABLE:
