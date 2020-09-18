@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  */
 public class ComponentFactory {
 
+    /** const strings */
     private static final String VARIABLE_TYPE = "variableType";
 
     private static final String VARIABLE_NAME = "variableName";
@@ -46,7 +47,7 @@ public class ComponentFactory {
      * @param details line details
      * @throws Exception (should be a specific exception).
      */
-    public static void addVariable(LineDetails details) throws Exception {
+    public static void addVariable(LineDetails details) throws VariableDeclarationException {
         Matcher matcher = details.getMatcher();
         String type = matcher.group(VARIABLE_TYPE);
         String name = matcher.group(VARIABLE_NAME);
@@ -54,29 +55,29 @@ public class ComponentFactory {
         String value = matcher.group(VARIABLE_VALUE);
         VariableType variableTypeValue = Classifier.classifyValue(value);
         if (finalPrefix != null && value == null){
-            throw new Exception();
+            throw new FinalUsageException();
         }
         if (variableTypeValue != null){
             String valueType = variableTypeValue.getTypeName();
             if (type.equals(INT) && !valueType.equals(INT)){
-                throw new Exception();
+                throw new VariableDeclarationException();
             }
 
             if (type.equals(DOUBLE) && !valueType.equals(DOUBLE)){
-                throw new Exception();
+                throw new VariableDeclarationException();
             }
 
             if (type.equals(STRING) && !valueType.equals(STRING)){
-                throw new Exception();
+                throw new VariableDeclarationException();
             }
 
             if (type.equals(CHAR) && !valueType.equals(CHAR)){
-                throw new Exception();
+                throw new VariableDeclarationException();
             }
 
             if (type.equals(BOOLEAN) && !valueType.equals(BOOLEAN) && !valueType.equals(DOUBLE) &&
                     !valueType.equals(INT)){
-                throw new Exception();
+                throw new VariableDeclarationException();
             }
         }
 

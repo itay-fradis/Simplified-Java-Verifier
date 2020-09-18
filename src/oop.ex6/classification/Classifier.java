@@ -32,7 +32,7 @@ public class Classifier {
      * @param value given value.
      * @return the type which fits to the given value.
      */
-    public static VariableType classifyValue(String value) throws Exception {
+    public static VariableType classifyValue(String value) throws IllegalValueException {
         if (value == null) {
             return null;
         }
@@ -42,6 +42,6 @@ public class Classifier {
                 return varType;
             }
         }
-        throw new Exception();
+        throw new IllegalValueException();
     }
 }

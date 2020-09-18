@@ -9,6 +9,9 @@ import java.io.IOException;
  */
 public class FileAnalysis {
 
+    /** IO ERROR MESSAGE */
+    private static final String IO_ERR_MSG = "ERROR: IO error occurred";
+
     /**
      * default constructor
      */
@@ -26,8 +29,8 @@ public class FileAnalysis {
             return 0;
         }
         catch (IOException e){
-            e.printStackTrace();
-            return 1;
+            System.err.println(IO_ERR_MSG);
+            return 2;
         }
         catch (Exception e){
             return 1;

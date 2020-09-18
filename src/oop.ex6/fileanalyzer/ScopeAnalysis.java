@@ -70,9 +70,9 @@ public class ScopeAnalysis {
                 case CLOSED_SCOPE_LINE:
                     break;
                 case BAD_LINE:
-                    throw new RuntimeException("test");
+                    throw new Exception("test");
                 default:
-                    throw new RuntimeException("error");
+                    throw new Exception("error");
             }
         }
     }
@@ -81,7 +81,7 @@ public class ScopeAnalysis {
      * parse normal line
      * @param line line to be parsed
      */
-    private static void parseNormalLine(String line) throws Exception {
+    private static void parseNormalLine(String line) throws BadLineFormatException {
         // remove semi colon
         line = line.substring(0, line.length() - 1);
         LineDetails detailsL = LineClassification.SemiColonClassify(line);
