@@ -24,8 +24,8 @@ public class FileAnalysis {
      */
     public static int Analysis(String toRead) {
         try (BufferedReader reader = new BufferedReader(new FileReader(toRead))){
-
-            ScopeAnalysis.Analyze(null, reader);
+            ScopeAnalysis scopeAnalysis = new ScopeAnalysis();
+            scopeAnalysis.Analyze(null, reader);
             return 0;
         }
         catch (IOException e){

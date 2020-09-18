@@ -20,10 +20,10 @@ public class Component {
      * @param name  - name
      * @param isFinal - is final
      */
-    public Component(String type, String name, String isFinal, String value){
+    public Component(VariableType type, String name, String isFinal, String value){
         if (isFinal != null)
             this.isFinal = true;
-        this.type = VariableType.getType(type);
+        this.type = type;
         this.name = name;
         this.value = value;
 
@@ -48,5 +48,12 @@ public class Component {
      */
     public boolean isFinal() {
         return isFinal;
+    }
+
+    /**
+     * @return value of component
+     */
+    public String getValue() {
+        return value;
     }
 }

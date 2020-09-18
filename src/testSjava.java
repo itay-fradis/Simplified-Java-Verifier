@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class testSjava {
 
     @Test
-    public void test001to9() throws FileNotFoundException {
+    public void test001to49() throws FileNotFoundException {
 
         // 1 - 9
         assertEquals(0, Sjavac.main(new String[]{"test001.sjava"}));
@@ -68,10 +68,14 @@ public class testSjava {
         assertEquals(1, Sjavac.main(new String[]{"test047.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test048.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test049.sjava"}));
+    }
+
+        @Test
+        public void test050to100() throws FileNotFoundException {
 
         // 50 - 59
-//        assertEquals(0, Sjavac.main(new String[]{"test050.sjava"}));
-//        assertEquals(0, Sjavac.main(new String[]{"test051.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test050.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test051.sjava"}));
 //        assertEquals(1, Sjavac.main(new String[]{"test052.sjava"}));
 //        assertEquals(1, Sjavac.main(new String[]{"test053.sjava"}));
 //        assertEquals(1, Sjavac.main(new String[]{"test054.sjava"}));

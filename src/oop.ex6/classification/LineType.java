@@ -1,7 +1,7 @@
 package oop.ex6.classification;
 
 
-public enum LineType { //todo separate between lineType and declerations
+public enum LineType {
 
     COMMENT("^//"),
 
@@ -21,11 +21,18 @@ public enum LineType { //todo separate between lineType and declerations
     VARIABLE_ASSIGNMENT("?<variableName>^[_a-zA-z]\\w*)(;|\\s*=\\s*(?<variableValue>\\w*;))");
 
 
-
+    /** the regex pattern */
     private final String regexPattern;
 
+    /**
+     * enum constructor
+     * @param regexPattern regex pattern
+     */
     LineType(final String regexPattern) { this.regexPattern = regexPattern;}
 
+    /**
+     * @return the enum's regex pattern
+     */
     public String getRegexPattern() {
         return regexPattern;
     }
