@@ -8,9 +8,9 @@ public enum Values {
     // Variable value patterns
     INT("^([-]?[1-9]\\d*|0)$"),
     DOUBLE("^([-]?[1-9]\\d*|0)(\\.\\d+)?$"),
-    STRING("(\'|\").*(\'|\")"),
+    STRING("\".*\""),
     BOOLEAN("^true$|^false$"),
-    CHAR("(\'|\").{1}(\'|\")"),
+    CHAR("'.{1}'"),
     VARIABLE_NAME("_?[a-zA-Z]{1}[\\w]*");
 
     /** the values's regex */
