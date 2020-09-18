@@ -24,5 +24,13 @@ public enum Values {
         this.value = value;
     }
 
+    /**
+     * @return the regex which holds the value private field
+     */
+    @Override
+    public String toString(){
+        return value;
+    }
+
 
 }

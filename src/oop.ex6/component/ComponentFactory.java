@@ -22,6 +22,16 @@ public class ComponentFactory {
 
     private static final String isFinal = "final";
 
+    private static final String INT = "int";
+
+    private static final String DOUBLE = "double";
+
+    private static final String STRING = "String";
+
+    private static final String CHAR = "char";
+
+    private static final String BOOLEAN = "boolean";
+
     /** private constructor */
     private ComponentFactory(){}
 
@@ -43,13 +53,32 @@ public class ComponentFactory {
         String finalPrefix = matcher.group(isFinal);
         String value = matcher.group(VARIABLE_VALUE);
         VariableType variableTypeValue = Classifier.classifyValue(value);
-        if (variableTypeValue != null && !type.equals(variableTypeValue.toString())){
+        if (finalPrefix != null && value == null){
             throw new Exception();
         }
+        if (variableTypeValue != null){
+            String valueType = variableTypeValue.getTypeName();
+            if (type.equals(INT) && !valueType.equals(INT)){
+                throw new Exception();
+            }
 
+            if (type.equals(DOUBLE) && !valueType.equals(DOUBLE)){
+                throw new Exception();
+            }
 
+            if (type.equals(STRING) && !valueType.equals(STRING)){
+                throw new Exception();
+            }
 
+            if (type.equals(CHAR) && !valueType.equals(CHAR)){
+                throw new Exception();
+            }
 
+            if (type.equals(BOOLEAN) && !valueType.equals(BOOLEAN) && !valueType.equals(DOUBLE) &&
+                    !valueType.equals(INT)){
+                throw new Exception();
+            }
+        }
 
     }
 }

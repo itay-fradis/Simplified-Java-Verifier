@@ -6,6 +6,8 @@ import oop.ex6.classification.LineType;
 import oop.ex6.component.Component;
 import oop.ex6.component.ComponentFactory;
 
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,12 +59,11 @@ public class ScopeAnalysis {
     public static void Analyze(Scope[] s, BufferedReader reader) throws Exception {
         String line;
         while ((line = reader.readLine()) != null){
+            line = line.trim();
             LineType type = LineClassification.generalClassify(line);
             switch (type){
-                case NORMAL_LINE: //todo send to other function
+                case NORMAL_LINE:
                     parseNormalLine(line);
-                    // change lineDetails to be a new class
-                    //
                     break;
                 case OPEN_SCOPE_LINE:
                     break;
@@ -81,7 +82,8 @@ public class ScopeAnalysis {
      * @param line line to be parsed
      */
     private static void parseNormalLine(String line) throws Exception {
-
+        // remove semi colon
+        line = line.substring(0, line.length() - 1);
         LineDetails detailsL = LineClassification.SemiColonClassify(line);
         switch (detailsL.getType()){
             case NEW_VARIABLE:

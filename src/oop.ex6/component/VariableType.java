@@ -5,7 +5,7 @@ import oop.ex6.classification.Values;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum VariableType {
+public enum VariableType { //change
 
     INT("int", Values.INT.toString()),
     DOUBLE("double", Values.DOUBLE.toString()),
@@ -32,6 +32,10 @@ public enum VariableType {
 
     public String getTypeRegex(){
         return regex;
+    }
+
+    public String getTypeName(){
+        return type;
     }
 
     public static VariableType getType(String type){return map.get(type);}

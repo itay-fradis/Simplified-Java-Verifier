@@ -1,6 +1,7 @@
 package oop.ex6.classification;
 
-public enum LineType {
+
+public enum LineType { //todo separate between lineType and declerations
 
     COMMENT("^//"),
 
@@ -10,12 +11,12 @@ public enum LineType {
 
     CLOSED_SCOPE_LINE("[}]$"),
 
-    RETURN("^return;$"),
+    RETURN("^return$"),
 
     BAD_LINE(""),
 
     NEW_VARIABLE("((?<final>^final\\s+)|(^))(?<variableType>[a-zA-z][a-z]+)\\s+" +
-            "(?<variableName>[_a-zA-z]\\w*)(;|\\s*=\\s*(?<variableValue>[\\w-.]*;))"),
+            "(?<variableName>[_a-zA-z]\\w*)(\\s*=\\s*(?<variableValue>[\\w-.]*))?"),
 
     VARIABLE_ASSIGNMENT("?<variableName>^[_a-zA-z]\\w*)(;|\\s*=\\s*(?<variableValue>\\w*;))");
 
