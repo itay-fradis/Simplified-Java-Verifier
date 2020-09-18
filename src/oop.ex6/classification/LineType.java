@@ -16,7 +16,7 @@ public enum LineType { //todo separate between lineType and declerations
     BAD_LINE(""),
 
     NEW_VARIABLE("((?<final>^final\\s+)|(^))(?<variableType>[a-zA-z][a-z]+)\\s+" +
-            "(?<variableName>[_a-zA-z]\\w*)(\\s*=\\s*(?<variableValue>[\\w-.]*))?"),
+            "(?<variableName>[_a-zA-z]\\w*)(\\s*=\\s*(?<variableValue>.*))?"),
 
     VARIABLE_ASSIGNMENT("?<variableName>^[_a-zA-z]\\w*)(;|\\s*=\\s*(?<variableValue>\\w*;))");
 
