@@ -1,6 +1,7 @@
 package oop.ex6.fileanalyzer;
 
 import oop.ex6.classification.LineClassification;
+import oop.ex6.classification.LineDetails;
 import oop.ex6.classification.LineType;
 import oop.ex6.component.Component;
 import oop.ex6.component.ComponentFactory;
@@ -8,7 +9,6 @@ import oop.ex6.component.ComponentFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 
 
 /**
@@ -59,17 +59,10 @@ public class ScopeAnalysis {
         while ((line = reader.readLine()) != null){
             LineType type = LineClassification.generalClassify(line);
             switch (type){
-                case NORMAL_LINE:
-                    LineClassification.LineDetails detailsL = LineClassification.SemiColonClassify(line);
-                    switch (detailsL.getType()){
-                        case NEW_VARIABLE:
-                            ComponentFactory.addVariable(detailsL);
-                            new Component(detailsL.getMatcher().group(VARIABLE_TYPE),
-                                    detailsL.getMatcher().group(VARIABLE_NAME)
-                                    , detailsL.getMatcher().group(isFinal),
-                                    detailsL.getMatcher().group(VARIABLE_VALUE));
-                            break;
-                    }
+                case NORMAL_LINE: //todo send to other function
+                    parseNormalLine(line);
+                    // change lineDetails to be a new class
+                    //
                     break;
                 case OPEN_SCOPE_LINE:
                     break;
@@ -80,6 +73,24 @@ public class ScopeAnalysis {
                 default:
                     throw new RuntimeException("error");
             }
+        }
+    }
+
+    /**
+     * parse normal line
+     * @param line line to be parsed
+     */
+    private static void parseNormalLine(String line) throws Exception {
+
+        LineDetails detailsL = LineClassification.SemiColonClassify(line);
+        switch (detailsL.getType()){
+            case NEW_VARIABLE:
+                ComponentFactory.addVariable(detailsL);
+                new Component(detailsL.getMatcher().group(VARIABLE_TYPE),
+                        detailsL.getMatcher().group(VARIABLE_NAME)
+                        , detailsL.getMatcher().group(isFinal),
+                        detailsL.getMatcher().group(VARIABLE_VALUE));
+                break;
         }
     }
 }

@@ -38,32 +38,6 @@ public class LineClassification {
     }
 
     /**
-     * holds line objects - Matcher and LineType
-     */
-    public static class LineDetails{
-        private final LineType type;
-        private final Matcher matcher;
-
-        /**
-         * constructor
-         * @param type line type
-         * @param matcher matcher object.
-         */
-        public LineDetails(LineType type, Matcher matcher){
-            this.matcher = matcher;
-            this.type = type;
-        }
-
-        public LineType getType() {
-            return type;
-        }
-
-        public Matcher getMatcher() {
-            return matcher;
-        }
-    }
-
-    /**
      * classify a line from a list of possible types
      * @param line - line to classify
      * @param types - types of lines possible

@@ -2,6 +2,7 @@ package oop.ex6.component;
 
 import oop.ex6.classification.Classifier;
 import oop.ex6.classification.LineClassification;
+import oop.ex6.classification.LineDetails;
 import oop.ex6.classification.LineType;
 
 import java.util.regex.Matcher;
@@ -35,7 +36,7 @@ public class ComponentFactory {
      * @param details line details
      * @throws Exception (should be a specific exception).
      */
-    public static void addVariable(LineClassification.LineDetails details) throws Exception {
+    public static void addVariable(LineDetails details) throws Exception {
         Matcher matcher = details.getMatcher();
         String type = matcher.group(VARIABLE_TYPE);
         String name = matcher.group(VARIABLE_NAME);
