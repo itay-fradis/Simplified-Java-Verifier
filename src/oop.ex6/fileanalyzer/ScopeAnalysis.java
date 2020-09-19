@@ -93,10 +93,10 @@ public class ScopeAnalysis {
         // remove semi colon
         line = line.substring(0, line.length() - 1);
         line = line.trim();
-        LineDetails detailsL = LineClassification.SemiColonClassify(line);
+        String[] varStrings = line.split(",");
+        LineDetails detailsL = LineClassification.SemiColonClassify(varStrings[0].trim());
         switch (detailsL.getType()){
             case NEW_VARIABLE:
-                String[] varStrings = line.split(",");
                 Matcher matcher = detailsL.getMatcher();
                 String type = matcher.group(VARIABLE_TYPE);
                 String finalPrefix = matcher.group(IS_FINAL);
