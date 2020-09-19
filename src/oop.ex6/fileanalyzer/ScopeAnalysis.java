@@ -29,7 +29,7 @@ public class ScopeAnalysis {
 
     private static final String VARIABLE_VALUE = "variableValue";
 
-    private static final String isFinal = "final";
+    private static final String IS_FINAL = "final";
 
     private static final String INT = "int";
 
@@ -96,9 +96,21 @@ public class ScopeAnalysis {
         LineDetails detailsL = LineClassification.SemiColonClassify(line);
         switch (detailsL.getType()){
             case NEW_VARIABLE:
-                addVariable(detailsL);
+                String[] varStrings = line.split(",");
+                Matcher matcher = detailsL.getMatcher();
+                String type = matcher.group(VARIABLE_TYPE);
+                String finalPrefix = matcher.group(IS_FINAL);
+                for (int i = 0; i < varStrings.length; i++) {
+                    varStrings[i] = varStrings[i].trim();
+                    LineDetails varDetails = LineClassification.SemiColonClassify(varStrings[i]);
+                    if (i > 0 && varDetails.getType() == LineType.NEW_VARIABLE){
+                        throw new BadLineFormatException();
+                    }
+                    addVariable(varDetails, type, finalPrefix);
+                }
                 break;
         }
+
     }
 
     /**
@@ -106,11 +118,11 @@ public class ScopeAnalysis {
      * @param details line details
      * @throws Exception (should be a specific exception).
      */
-    private void addVariable(LineDetails details) throws VariableDeclarationException {
+    private void addVariable(LineDetails details, String declaredType, String isFinal) throws VariableDeclarationException {
         Matcher matcher = details.getMatcher();
-        String type = matcher.group(VARIABLE_TYPE);
+        String type = declaredType;
         String name = matcher.group(VARIABLE_NAME);
-        String finalPrefix = matcher.group(isFinal);
+        String finalPrefix = isFinal;
         String value = matcher.group(VARIABLE_VALUE);
         value = checkIfAssignedByVariable(value);
         VariableType variableTypeValue = Classifier.classifyValue(value);
