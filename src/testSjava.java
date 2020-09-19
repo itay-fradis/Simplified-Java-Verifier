@@ -85,5 +85,14 @@ public class testSjava {
         assertEquals(0, Sjavac.main(new String[]{"test058.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test059.sjava"}));
 
+        // 61 - 67
+        assertEquals(1, Sjavac.main(new String[]{"test061.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test062.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test063.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test064.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test065.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test066.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test067.sjava"}));
+
     }
 }

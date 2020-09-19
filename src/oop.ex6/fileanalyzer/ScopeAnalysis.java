@@ -42,12 +42,12 @@ public class ScopeAnalysis {
     private static final String BOOLEAN = "boolean";
 
     /** hold the codeFile variables */
-    private List<Component> variables = new ArrayList<>();
+    final private List<Component> variables = new ArrayList<>();
 
     /**
      * a private class represent a scope
      */
-    private class Scope{
+    private static class Scope{
         private ArrayList<Component> components;
     }
 
@@ -109,51 +109,68 @@ public class ScopeAnalysis {
                     addVariable(varDetails, type, finalPrefix);
                 }
                 break;
+            case VARIABLE_ASSIGNMENT:
+                Component x = foundComponent(varStrings[0]);
         }
 
     }
 
     /**
+     * @param varString the given variable
+     * @return the component to be assigned
+     * @throws BadLineFormatException if not found
+     */
+    private Component foundComponent(String varString) throws BadLineFormatException {
+        for (Component component: variables){
+            if (component.getName().equals(varString)){
+                return component;
+            }
+        }
+        throw new BadLineFormatException();
+    }
+
+    /**
      * check if variable declaration is legal, and add it. (not completed yet)
      * @param details line details
-     * @throws Exception (should be a specific exception).
+     * @throws VariableDeclarationException undefined declaration.
      */
     private void addVariable(LineDetails details, String declaredType, String isFinal) throws VariableDeclarationException {
         Matcher matcher = details.getMatcher();
-        String type = declaredType;
         String name = matcher.group(VARIABLE_NAME);
-        String finalPrefix = isFinal;
         String value = matcher.group(VARIABLE_VALUE);
         value = checkIfAssignedByVariable(value);
         VariableType variableTypeValue = Classifier.classifyValue(value);
-        if (finalPrefix != null && value == null){
+        if (isFinal != null && value == null){
             throw new FinalUsageException();
+        }
+        if (!Classifier.isLegalVariableType(declaredType)){
+            throw new VariableDeclarationException();
         }
         if (variableTypeValue != null){
             String valueType = variableTypeValue.getTypeName();
-            if (type.equals(INT) && !valueType.equals(INT)){
+            if (declaredType.equals(INT) && !valueType.equals(INT)){
                 throw new VariableDeclarationException();
             }
 
-            if (type.equals(DOUBLE) && !valueType.equals(DOUBLE) && !valueType.equals(INT)){
+            if (declaredType.equals(DOUBLE) && !valueType.equals(DOUBLE) && !valueType.equals(INT)){
                 throw new VariableDeclarationException();
             }
 
-            if (type.equals(STRING) && !valueType.equals(STRING) && !valueType.equals(CHAR)){
+            if (declaredType.equals(STRING) && !valueType.equals(STRING) && !valueType.equals(CHAR)){
                 throw new VariableDeclarationException();
             }
 
-            if (type.equals(CHAR) && !valueType.equals(CHAR)){
+            if (declaredType.equals(CHAR) && !valueType.equals(CHAR)){
                 throw new VariableDeclarationException();
             }
 
-            if (type.equals(BOOLEAN) && !valueType.equals(BOOLEAN) && !valueType.equals(DOUBLE) &&
+            if (declaredType.equals(BOOLEAN) && !valueType.equals(BOOLEAN) && !valueType.equals(DOUBLE) &&
                     !valueType.equals(INT)){
                 throw new VariableDeclarationException();
             }
         }
 
-        variables.add(new Component(Classifier.classifyValue(value), name, finalPrefix, value));
+        variables.add(new Component(Classifier.classifyValue(value), name, isFinal, value));
 
     }
 

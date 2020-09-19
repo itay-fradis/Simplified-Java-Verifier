@@ -11,8 +11,7 @@ public enum VariableType { //change
     DOUBLE("double", Values.DOUBLE.toString()),
     STRING("String", Values.STRING.toString()),
     BOOLEAN("boolean", Values.BOOLEAN.toString()),
-    CHAR("char", Values.CHAR.toString()),
-    REFERENCE("reference", Values.VARIABLE_NAME.toString());
+    CHAR("char", Values.CHAR.toString());
 
     private static final Map<String, VariableType> map = new HashMap<>();
 
