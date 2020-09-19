@@ -76,11 +76,11 @@ public class testSjava {
         // 50 - 59
         assertEquals(0, Sjavac.main(new String[]{"test050.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test051.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test052.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test053.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test054.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test055.sjava"}));
-//        assertEquals(0, Sjavac.main(new String[]{"test056.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test052.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test053.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test054.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test055.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test056.sjava"}));
 //        assertEquals(1, Sjavac.main(new String[]{"test057.sjava"}));
 //        assertEquals(0, Sjavac.main(new String[]{"test058.sjava"}));
 //        assertEquals(0, Sjavac.main(new String[]{"test059.sjava"}));

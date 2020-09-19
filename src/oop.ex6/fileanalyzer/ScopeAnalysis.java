@@ -75,6 +75,8 @@ public class ScopeAnalysis {
                     break;
                 case CLOSED_SCOPE_LINE:
                     break;
+                case COMMENT:
+                    continue;
                 case BAD_LINE:
                     throw new Exception("test");
                 default:
@@ -139,7 +141,7 @@ public class ScopeAnalysis {
             }
         }
 
-        variables.add(new Component(variableTypeValue, name, isFinal, value));
+        variables.add(new Component(Classifier.classifyValue(value), name, finalPrefix, value));
 
     }
 
@@ -148,9 +150,12 @@ public class ScopeAnalysis {
      * @param value value to be returned
      * @return updated value
      */
-    private String checkIfAssignedByVariable(String value) {
+    private String checkIfAssignedByVariable(String value) throws VariableDeclarationException {
         for (Component variable: variables){
             if (variable.getName().equals(value)){
+                if (variable.getValue() == null){
+                    throw new VariableDeclarationException();
+                }
                 return variable.getValue();
             }
         }
