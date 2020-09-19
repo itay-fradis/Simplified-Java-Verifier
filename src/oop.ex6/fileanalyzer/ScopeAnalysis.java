@@ -111,6 +111,8 @@ public class ScopeAnalysis {
                 break;
             case VARIABLE_ASSIGNMENT:
                 Component x = foundComponent(varStrings[0]);
+            case BAD_LINE:
+                throw new BadLineFormatException();
         }
 
     }
