@@ -1,47 +1,49 @@
 package oop.ex6.component;
 
-import oop.ex6.classification.Values;
-
+import java.util.HashMap;
 
 /**
- * enum represent a reserved keyword of variable type
+ * enum of different values.
  */
-public enum VariableType { //change
+public enum VariableType {
 
-    INT("int", Values.INT.toString()),
-    DOUBLE("double", Values.DOUBLE.toString()),
-    STRING("String", Values.STRING.toString()),
-    BOOLEAN("boolean", Values.BOOLEAN.toString()),
-    CHAR("char", Values.CHAR.toString());
+    // Variable value patterns
+    INT("int", "^([-]?[1-9]\\d*|0)$"),
+    DOUBLE("double", "(^([-]?[1-9]\\d*|0)(\\.\\d+))$" + "|" + INT.getRegex()),
+    STRING("String", "(\".*\")"),
+    BOOLEAN("boolean", "(^true$|^false$)" + "|" + INT.getRegex() + "|" + DOUBLE.getRegex()),
+    CHAR("char", "('.{1}')");
 
-    /** the variable type */
-    private final String type;
-
-    /** the regex of a value of the specific type */
-    private final String regex;
+    /** the values's regex */
+    private final String value;
+    private final String name;
 
     /**
-     * enum constructor
-     * @param type type of variableType
-     * @param regex regex of variableType
+     * constructor
+     * @param value value's regex
      */
-    VariableType(String type, String regex) {
-        this.type = type;
-        this.regex = regex;
+    VariableType(final String name,final String value){
+        this.name = name;
+        this.value = value;
     }
 
     /**
-     * @return regex of variableType
+     * @return the regex which holds the value private field
      */
-    public String getTypeRegex(){
-        return regex;
+    public String getRegex(){
+        return value;
     }
 
-    /**
-     * @return type of variableType
-     */
-    public String getTypeName(){
-        return type;
+    public static VariableType getType(String name){
+        return variablesRegex.get(name);
     }
+
+    static HashMap<String, VariableType> variablesRegex = new HashMap<>();
+    static {
+        for (VariableType v: VariableType.values()){
+            variablesRegex.put(v.name, v);
+        }
+    }
+
 
 }

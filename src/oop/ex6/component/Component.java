@@ -1,5 +1,6 @@
 package oop.ex6.component;
 
+
 /**
  * an abstract class represents a component
  */

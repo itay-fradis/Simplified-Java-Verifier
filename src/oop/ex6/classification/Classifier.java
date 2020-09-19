@@ -37,25 +37,11 @@ public class Classifier {
             return null;
         }
         for (VariableType varType : VariableType.values()) {
-            Matcher match = Pattern.compile(varType.getTypeRegex()).matcher(value);
+            Matcher match = Pattern.compile(varType.getRegex()).matcher(value);
             if (match.matches()) {
                 return varType;
             }
         }
         throw new IllegalValueException();
-    }
-
-    /**
-     * checks if a variable has a legal declaration of type
-     * @param type to be checked
-     * @return true if it is legal, false otherwise
-     */
-    public static boolean isLegalVariableType(String type){
-        for (VariableType variableType: VariableType.values()){
-            if (variableType.getTypeName().equals(type)){
-                return true;
-            }
-        }
-        return false;
     }
 }
