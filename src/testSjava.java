@@ -98,7 +98,23 @@ public class testSjava {
 
     @Test
     public void myTest() throws FileNotFoundException {
+        // checks for variations of final
         assertEquals(1, Sjavac.main(new String[]{"mytest01.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"mytest02.sjava"}));
+
+        // check  illegal variable name
+        assertEquals(1, Sjavac.main(new String[]{"mytest03.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"mytest04.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"mytest05.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"mytest06.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"mytest07.sjava"}));
+
+        //legal names
+        assertEquals(0, Sjavac.main(new String[]{"mytest08.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"mytest09.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"mytest10.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"mytest11.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"mytest12.sjava"}));
+
     }
 }
