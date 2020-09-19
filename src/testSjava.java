@@ -99,5 +99,6 @@ public class testSjava {
     @Test
     public void myTest() throws FileNotFoundException {
         assertEquals(1, Sjavac.main(new String[]{"mytest01.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"mytest02.sjava"}));
     }
 }

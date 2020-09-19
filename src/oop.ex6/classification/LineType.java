@@ -15,16 +15,13 @@ public enum LineType {
 
     BAD_LINE(""),
 
-    NEW_VARIABLE("((?<final>^final\\s+)|(^))(?<variableType>[a-zA-z][a-z]+)?\\s+" +
-            "(?<variableName>[_a-zA-z]\\w*)(\\s*=\\s*(?<variableValue>.*))?"),
+    NEW_VARIABLE("(?<final>^final\\s+)?(?<variableType>[\\w]+)?\\s+(?<arguments>[^;]+);"),
 
-
-
-    VARIABLE_ASSIGNMENT("(?<variableName>^[_a-zA-Z]\\w*)(\\s*=\\s*(?<variableValue>\\w*))?");
-
+    VARIABLE_ASSIGNMENT("(?<variableName>[^;=\\s]+)(\\s*=\\s*(?<variableValue>.*))?");
 
     /** the regex pattern */
     private final String regexPattern;
+
 
     /**
      * enum constructor
