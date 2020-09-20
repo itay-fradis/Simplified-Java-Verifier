@@ -15,6 +15,8 @@ public enum LineType {
 
     RETURN("^return;$"),
 
+    CONDITION("(?<condition>(^if|^while))\\s*\\((?<arguments>.*)\\)\\{"),
+
     BAD_LINE(""),
 
     NEW_METHOD("(?<methodType>[^\\s]+)\\s*(?<methodName>[^\\(\\s]+)" +

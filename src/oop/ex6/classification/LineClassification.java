@@ -13,10 +13,13 @@ public class LineClassification {
     private static final LineType[] generalTypes = new LineType[]{LineType.COMMENT, LineType.NORMAL_LINE,
             LineType.CLOSED_SCOPE_LINE, LineType.OPEN_SCOPE_LINE};
     /**
-     * types of line end on semi colon
+     * types of line end with semi colon
      */
     private static final LineType[] SEMICOLON_TYPES = new LineType[]{
             LineType.RETURN, LineType.NEW_VARIABLE, LineType.VARIABLE_ASSIGNMENT};
+
+    /** types of line ends with open parenthesis */
+    private static final LineType[] OPEN_PARENTHESIS = new LineType[]{LineType.NEW_METHOD, LineType.CONDITION};
 
     /**
      * default constructor
@@ -56,19 +59,18 @@ public class LineClassification {
     /**
      * classify semicolon ended types of line
      * @param line - line to classify
-     * @return - type
+     * @return - lineDetails
      */
     public static LineDetails SemiColonClassify(String line){
         return classify(line, SEMICOLON_TYPES);
     }
 
     /**
-     *
-     * @param line
-     * @return
+     * @param line line with openParenthesisToClassify
+     * @return lineDetails
      */
     public static LineDetails openParenthesisClassify(String line){
-        return classify(line, new LineType[]{LineType.NEW_METHOD});
+        return classify(line, OPEN_PARENTHESIS);
     }
 
 

@@ -39,6 +39,5 @@ public class Sjavac {
             System.out.println(SJAVA_FILE_WARNING);
         }
         return (FileAnalysis.Analysis(fileName));
-
     }
 }

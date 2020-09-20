@@ -66,7 +66,7 @@ public class VariableFactory {
         Matcher matcher = p.matcher(value);
         if (!matcher.matches())
             throw new VariableDeclarationException();
-        return new Variable(vType, name, finalPrefix, value); //todo check matcher.group(1)
+        return new Variable(vType, name, finalPrefix, value);
     }
 
 

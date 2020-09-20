@@ -3,7 +3,7 @@ package oop.ex6.component;
 import java.util.HashMap;
 
 /**
- * enum of different values.
+ * enum of the reserved values .
  */
 public enum VariableType {
 
@@ -14,7 +14,7 @@ public enum VariableType {
     BOOLEAN("boolean", "(^true$|^false$)" + "|" + INT.getRegex() + "|" + DOUBLE.getRegex()),
     CHAR("char", "('.{1}')");
 
-    /** the values's regex */
+    /** the value's regex */
     private final String value;
     private final String name;
 
@@ -35,19 +35,18 @@ public enum VariableType {
     }
 
     /**
-     *
-     * @param name
-     * @return
+     * @param name of variable type
+     * @return variable type enum
      */
     public static VariableType getType(String name){
         return variablesRegex.get(name);
     }
 
-    /***/
+    /** map that fits between variable type enum and its name */
     private final static HashMap<String, VariableType> variablesRegex = new HashMap<>();
 
     /**
-     *
+     * inits the variableRegex field
      */
     static {
         for (VariableType v: VariableType.values()){

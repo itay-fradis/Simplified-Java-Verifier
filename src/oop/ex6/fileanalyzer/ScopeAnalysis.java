@@ -1,26 +1,20 @@
 package oop.ex6.fileanalyzer;
 
-import oop.ex6.classification.LineClassification;
-import oop.ex6.classification.LineDetails;
-import oop.ex6.classification.LineType;
+import oop.ex6.classification.*;
 import oop.ex6.component.*;
 
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 /**
- * Analyze a scope in file
+ * Analyze all scopes in file
  */
 public class ScopeAnalysis {
 
-    /** const strings */
+    /** const strings for regex usage */
     private static final String VARIABLE_TYPE = "variableType";
 
     private static final String ARGUMENTS = "arguments";
@@ -40,7 +34,7 @@ public class ScopeAnalysis {
     /**
      * a deque of scopes
      */
-    private static LinkedList<Scope> scopes;
+    private final LinkedList<Scope> scopes;
 
     /**
      * constructor
@@ -51,20 +45,20 @@ public class ScopeAnalysis {
     }
 
     /**
-     * a private class represent a scope
+     * a private class represent a single scope
      */
     private class Scope{
 
-        /***/
-        private ArrayList<Variable> variables;
-        private ArrayList<Method> methods;
+        /** the scope's methods and variables */
+        private final Map<String, Variable> variables;
+        private final Map<String, Method> methods;
 
         /**
-         *
+         * Scope constructor
          */
         private Scope(){
-            variables = new ArrayList<>();
-            methods = new ArrayList<>();
+            variables = new HashMap();
+            methods = new HashMap();
         }
     }
 
@@ -73,7 +67,7 @@ public class ScopeAnalysis {
      * @param reader - reader of file
      * @throws IOException - when cannot read from file
      */
-    public void Analyze(BufferedReader reader) throws Exception {
+    public void Analyze(BufferedReader reader) throws IOException, BadLineFormatException {
         String line;
         while ((line = reader.readLine()) != null){
             line = line.trim();
@@ -83,25 +77,27 @@ public class ScopeAnalysis {
                     parseNormalLine(line);
                     break;
                 case OPEN_SCOPE_LINE:
-                    parseMethod(line);
+                    parseNewScope(line);
                     break;
                 case CLOSED_SCOPE_LINE:
                     break;
                 case COMMENT:
                     continue;
                 case BAD_LINE:
-                    throw new Exception("test");
+                    throw new BadLineFormatException();
                 default:
-                    throw new Exception("error");
+                    throw new BadLineFormatException();
             }
         }
     }
 
     /**
-     *
-     * @param line
+     * parse new Scope.
+     * @param line given line to parse
+     * @throws BadLineFormatException bad method declaration
      */
-    private void parseMethod(String line) throws BadLineFormatException {
+    private void parseNewScope(String line) throws BadLineFormatException {
+        scopes.add(new Scope());
         LineDetails detailsL = LineClassification.openParenthesisClassify(line);
         switch (detailsL.getType()){
             case NEW_METHOD:
@@ -109,13 +105,13 @@ public class ScopeAnalysis {
                 break;
             case BAD_LINE:
                 throw new BadLineFormatException();
-            //case IF:
+                //case IF:
         }
     }
 
     /**
-     *
-     * @param matcher
+     * creates and add method to scope.
+     * @param matcher matcher of line with method-regex
      */
     private void addMethod(Matcher matcher) throws BadLineFormatException {
         String mType = matcher.group(METHOD_TYPE);
@@ -124,12 +120,12 @@ public class ScopeAnalysis {
         if (matcher.group(ARGUMENTS).length() == 0){
             arguments = new String[0];
         }
-        scopes.getLast().methods.add(MethodFactory.addMethod(mType, mName, arguments));
+        scopes.getLast().methods.put(mName, MethodFactory.addMethod(mType, mName, arguments));
 
     }
 
     /**
-     * parse normal line
+     * parse normal line which ends with semicolon.
      * @param line line to be parsed
      */
     private void parseNormalLine(String line) throws BadLineFormatException {
@@ -160,10 +156,9 @@ public class ScopeAnalysis {
             if (matcher.matches()) {
                 String value = matcher.group(VARIABLE_VALUE);
                 value = checkIfAssignedByVariable(value);
-                Scope sc = scopes.getLast();
-                scopes.getLast().variables.add(
+                scopes.getLast().variables.put(matcher.group(VARIABLE_NAME),
                         VariableFactory.addVariable(matcher.group(VARIABLE_NAME), value,
-                        finalPrefix, variableType));
+                                finalPrefix, variableType));
             }
             else
                 throw new VariableDeclarationException();
@@ -177,7 +172,7 @@ public class ScopeAnalysis {
      */
     private String checkIfAssignedByVariable(String value) throws VariableDeclarationException {
         for (Scope s: scopes){
-            for (Variable variable: s.variables){
+            for (Variable variable: s.variables.values()){
                 if (variable.getName().equals(value)){
                     if (variable.getValue() == null){
                         throw new VariableDeclarationException();

@@ -10,7 +10,7 @@ public class Variable {
     private final String name;
     /** is component final*/
     private boolean isFinal = false;
-    /***/
+    /** value of variable */
     private String value;
 
 
