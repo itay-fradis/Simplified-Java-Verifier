@@ -11,27 +11,45 @@ public class MethodFactory {
     /***/
     private static final String METHOD_TYPE_REGEX = "^void$";
 
+    /***/
+    private static final String METHOD_NAME_REGEX = "[a-zA-Z]\\w*";
+
+    /***/
+    private static final String METHOD_ARG_REGEX = "(?<final>^final\\s+)?(?<variableType>[\\w]+)?\\s+(?<arguments>[^;]+);";
+
     /**
      *
-     * @param name
-     * @param numOfArgs
+     * @param type
      * @return
      * @throws MethodDeclarationException
      */
-    public static Method addMethod(String name, int numOfArgs) throws MethodDeclarationException {
-        if (!isLegalType(name)){
+    public static Method addMethod(String type,String name, String[] arguments) throws MethodDeclarationException {
+        if (!isLegalType(type) || !isLegalName(name)){
             throw new MethodDeclarationException();
         }
-        return new Method(name, numOfArgs);
+        for (String arg: arguments){
+
+        }
+        return new Method(name);
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    private static boolean isLegalName(String name) {
+        Matcher matcher = Pattern.compile(METHOD_NAME_REGEX).matcher(name);
+        return matcher.matches();
     }
 
     /**
      * checks if method name is legal
-     * @param name given name
+     * @param type given name
      * @return true if legal, false otherwise
      */
-    private static boolean isLegalType(String name) {
-        Matcher matcher = Pattern.compile(METHOD_TYPE_REGEX).matcher(name);
+    private static boolean isLegalType(String type) {
+        Matcher matcher = Pattern.compile(METHOD_TYPE_REGEX).matcher(type);
         return matcher.matches();
     }
 }
