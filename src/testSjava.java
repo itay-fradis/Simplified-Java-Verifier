@@ -138,7 +138,7 @@ public class testSjava {
         assertEquals(0, Sjavac.main(new String[]{"test113.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test114.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test115.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test116.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test116.sjava"}));
 //        assertEquals(1, Sjavac.main(new String[]{"test117.sjava"}));
 
     }

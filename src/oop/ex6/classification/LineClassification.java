@@ -11,7 +11,7 @@ public class LineClassification {
      * general type of lines
      */
     private static final LineType[] generalTypes = new LineType[]{LineType.COMMENT, LineType.NORMAL_LINE,
-            LineType.CLOSED_SCOPE_LINE, LineType.OPEN_SCOPE_LINE};
+            LineType.CLOSED_SCOPE_LINE, LineType.OPEN_SCOPE_LINE, LineType.EMPTY_LINE};
     /**
      * types of line end with semi colon
      */
@@ -19,7 +19,7 @@ public class LineClassification {
             LineType.RETURN, LineType.NEW_VARIABLE, LineType.VARIABLE_ASSIGNMENT};
 
     /** types of line ends with open parenthesis */
-    private static final LineType[] OPEN_PARENTHESIS = new LineType[]{LineType.NEW_METHOD, LineType.CONDITION};
+    private static final LineType[] OPEN_PARENTHESIS = new LineType[]{LineType.CONDITION, LineType.NEW_METHOD};
 
     /**
      * default constructor

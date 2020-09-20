@@ -27,6 +27,8 @@ public class ScopeAnalysis {
 
     private static final String ARGUMENTS_DELIMITER = ",";
 
+    private static final String CONDITION_DELIMITER = "(\\|{2}|\\&{2})";
+
     private static final String METHOD_TYPE = "methodType";
 
     private static final String METHOD_NAME = "methodName";
@@ -41,7 +43,7 @@ public class ScopeAnalysis {
      */
     public ScopeAnalysis(){
         scopes = new LinkedList<>();
-        scopes.add(new Scope());
+        scopes.push(new Scope());
     }
 
     /**
@@ -80,11 +82,11 @@ public class ScopeAnalysis {
                     parseNewScope(line);
                     break;
                 case CLOSED_SCOPE_LINE:
+                    scopes.pop();
                     break;
                 case COMMENT:
+                case EMPTY_LINE:
                     continue;
-                case BAD_LINE:
-                    throw new BadLineFormatException();
                 default:
                     throw new BadLineFormatException();
             }
@@ -97,16 +99,63 @@ public class ScopeAnalysis {
      * @throws BadLineFormatException bad method declaration
      */
     private void parseNewScope(String line) throws BadLineFormatException {
-        scopes.add(new Scope());
+        scopes.push(new Scope());
         LineDetails detailsL = LineClassification.openParenthesisClassify(line);
         switch (detailsL.getType()){
             case NEW_METHOD:
                 addMethod(detailsL.getMatcher());
                 break;
+            case CONDITION:
+                checkCondition(detailsL.getMatcher().group(ARGUMENTS));
+                break;
             case BAD_LINE:
                 throw new BadLineFormatException();
                 //case IF:
         }
+    }
+
+    /**
+     * check if a condition line in correct form
+     * @param arg - arguments in condition
+     */
+    private void checkCondition(String arg) throws BadConditionException {
+        String[] args = arg.split(CONDITION_DELIMITER);
+        Pattern p = Pattern.compile(VariableType.BOOLEAN.getRegex());
+        for (String str: args){
+            Matcher matcher = p.matcher(str);
+            if (!matcher.matches() && !checkBoolean(str)) {
+                throw new BadConditionException();
+            }
+        }
+    }
+
+    /**
+     * check if it is a valid boolean parameter
+     * @param boolParameter boolean parameter to check
+     * @return true if valid, false otherwise
+     */
+    private boolean checkBoolean(String boolParameter) {
+        Variable variable;
+        if ((variable = searchVariable(boolParameter)) != null){
+            VariableType type = variable.getType();
+            return type == VariableType.BOOLEAN || type == VariableType.DOUBLE
+                    || type == VariableType.INT;
+            /// to add if boolean is initialized
+        }
+        return false;
+    }
+
+    /**
+     * if a variable assigned by another var, it will return's its value.
+     * @param name name of variable
+     * @return updated value
+     */
+    private Variable searchVariable(String name){
+        for (Scope sc: scopes){
+            if (sc.variables.containsKey(name))
+                return sc.variables.get(name);
+        }
+        return null;
     }
 
     /**
@@ -120,7 +169,7 @@ public class ScopeAnalysis {
         if (matcher.group(ARGUMENTS).length() == 0){
             arguments = new String[0];
         }
-        scopes.getLast().methods.put(mName, MethodFactory.addMethod(mType, mName, arguments));
+        scopes.getFirst().methods.put(mName, MethodFactory.addMethod(mType, mName, arguments));
 
     }
 
@@ -156,7 +205,7 @@ public class ScopeAnalysis {
             if (matcher.matches()) {
                 String value = matcher.group(VARIABLE_VALUE);
                 value = checkIfAssignedByVariable(value);
-                scopes.getLast().variables.put(matcher.group(VARIABLE_NAME),
+                scopes.getFirst().variables.put(matcher.group(VARIABLE_NAME),
                         VariableFactory.addVariable(matcher.group(VARIABLE_NAME), value,
                                 finalPrefix, variableType));
             }

@@ -13,9 +13,11 @@ public enum LineType {
 
     CLOSED_SCOPE_LINE("[}]$"),
 
+    EMPTY_LINE(""),
+
     RETURN("^return;$"),
 
-    CONDITION("(?<condition>(^if|^while))\\s*\\((?<arguments>.*)\\)\\{"),
+    CONDITION("(?<condition>(^if|^while))\\s*\\((?<arguments>.*)\\)\\s*\\{"),
 
     BAD_LINE(""),
 
