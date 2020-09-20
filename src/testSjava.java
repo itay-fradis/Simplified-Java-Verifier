@@ -118,7 +118,7 @@ public class testSjava {
     }
 
     @Test
-    public void test101to200() throws FileNotFoundException {
+    public void test101to117() throws FileNotFoundException {
 
         // 101 - 109
         assertEquals(1, Sjavac.main(new String[]{"test101.sjava"}));
@@ -139,7 +139,74 @@ public class testSjava {
         assertEquals(1, Sjavac.main(new String[]{"test114.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test115.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test116.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test117.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test117.sjava"}));
+
+    }
+
+    @Test
+    public void test201to300() throws FileNotFoundException {
+
+        // 201 - 209
+        assertEquals(0, Sjavac.main(new String[]{"test201.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test202.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test203.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test204.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test205.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test206.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test207.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test208.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test209.sjava"}));
+
+        // 211 - 219
+        assertEquals(0, Sjavac.main(new String[]{"test211.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test212.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test213.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test214.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test215.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test216.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test217.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test218.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test219.sjava"}));
+
+        // 221 - 227
+        assertEquals(0, Sjavac.main(new String[]{"test221.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test222.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test223.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test224.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test225.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test226.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test227.sjava"}));
+
+        // 231 - 239
+        assertEquals(0, Sjavac.main(new String[]{"test231.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test232.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test233.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test234.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test235.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test236.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test237.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test238.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test239.sjava"}));
+
+        // 241 - 249
+        assertEquals(0, Sjavac.main(new String[]{"test241.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test242.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test243.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test244.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test245.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test246.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test247.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test248.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test249.sjava"}));
+
+        // 250 - 257
+        assertEquals(1, Sjavac.main(new String[]{"test250.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test251.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test252.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test253.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test254.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test255.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test257.sjava"}));
 
     }
 }
