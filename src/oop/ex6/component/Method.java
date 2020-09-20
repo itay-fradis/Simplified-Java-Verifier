@@ -14,9 +14,9 @@ public class Method {
 
     private List<Variable> givenVariables;
 
-    public Method(String methodName){
+    public Method(String methodName, List<Variable> list){
         this.name = methodName;
-        givenVariables = new ArrayList<>();
+        givenVariables = list;
     }
 
 }

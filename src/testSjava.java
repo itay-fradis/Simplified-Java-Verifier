@@ -128,7 +128,18 @@ public class testSjava {
         assertEquals(1, Sjavac.main(new String[]{"test105.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test106.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test107.sjava"}));
-//        assertEquals(0, Sjavac.main(new String[]{"test108.sjava"}));
-//        assertEquals(0, Sjavac.main(new String[]{"test109.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test108.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test109.sjava"}));
+
+        // 110 - 117
+        assertEquals(0, Sjavac.main(new String[]{"test110.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test111.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test112.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test113.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test114.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test115.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test116.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test117.sjava"}));
+
     }
 }

@@ -41,7 +41,7 @@ public class VariableFactory {
      * @param name given variable name
      * @return whether the name is legal or not
      */
-    private static boolean isNameLegal(String name) {
+    public static boolean isNameLegal(String name) {
         Matcher matcher = Pattern.compile(VARIABLE_NAME_REGEX).matcher(name);
         return matcher.matches();
     }
@@ -66,7 +66,7 @@ public class VariableFactory {
         Matcher matcher = p.matcher(value);
         if (!matcher.matches())
             throw new VariableDeclarationException();
-        return new Variable(vType, name, finalPrefix, matcher.group(1)); //todo check matcher.group(1)
+        return new Variable(vType, name, finalPrefix, value); //todo check matcher.group(1)
     }
 
 

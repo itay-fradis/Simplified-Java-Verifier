@@ -121,6 +121,9 @@ public class ScopeAnalysis {
         String mType = matcher.group(METHOD_TYPE);
         String mName = matcher.group(METHOD_NAME);
         String[] arguments = matcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
+        if (matcher.group(ARGUMENTS).length() == 0){
+            arguments = new String[0];
+        }
         scopes.getLast().methods.add(MethodFactory.addMethod(mType, mName, arguments));
 
     }
