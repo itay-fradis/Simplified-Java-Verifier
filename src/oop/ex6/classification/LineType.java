@@ -13,12 +13,12 @@ public enum LineType {
 
     CLOSED_SCOPE_LINE("[}]$"),
 
-    RETURN("^return$"),
+    RETURN("^return;$"),
 
     BAD_LINE(""),
 
-    NEW_METHOD("(?<methodType>[^\\s])\\s*(?<methodName>[^\\(\\s]+)" +
-            "\\s*((?<arguments>.)\\)\\s{"),
+    NEW_METHOD("(?<methodType>[^\\s]+)\\s*(?<methodName>[^\\(\\s]+)" +
+            "\\s*\\((?<arguments>.*)\\)\\s*\\{"),
 
     NEW_VARIABLE("(?<final>^final\\s+)?(?<variableType>[\\w]+)?\\s+(?<arguments>[^;]+);"),
 

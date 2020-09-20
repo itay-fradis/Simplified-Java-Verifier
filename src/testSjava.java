@@ -71,7 +71,7 @@ public class testSjava {
     }
 
         @Test
-        public void test050to100() throws FileNotFoundException {
+        public void test050to67() throws FileNotFoundException {
 
         // 50 - 59
         assertEquals(0, Sjavac.main(new String[]{"test050.sjava"}));
@@ -115,6 +115,20 @@ public class testSjava {
         assertEquals(0, Sjavac.main(new String[]{"mytest10.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"mytest11.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"mytest12.sjava"}));
+    }
 
+    @Test
+    public void test101to200() throws FileNotFoundException {
+
+        // 101 - 109
+        assertEquals(1, Sjavac.main(new String[]{"test101.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test102.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test103.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test104.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test105.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test106.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test107.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test108.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test109.sjava"}));
     }
 }

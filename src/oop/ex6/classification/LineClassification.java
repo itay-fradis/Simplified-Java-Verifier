@@ -62,5 +62,14 @@ public class LineClassification {
         return classify(line, SEMICOLON_TYPES);
     }
 
+    /**
+     *
+     * @param line
+     * @return
+     */
+    public static LineDetails openParenthesisClassify(String line){
+        return classify(line, new LineType[]{LineType.NEW_METHOD});
+    }
+
 
 }
