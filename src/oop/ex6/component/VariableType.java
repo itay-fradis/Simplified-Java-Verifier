@@ -34,11 +34,21 @@ public enum VariableType {
         return value;
     }
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     public static VariableType getType(String name){
         return variablesRegex.get(name);
     }
 
-    static HashMap<String, VariableType> variablesRegex = new HashMap<>();
+    /***/
+    private final static HashMap<String, VariableType> variablesRegex = new HashMap<>();
+
+    /**
+     *
+     */
     static {
         for (VariableType v: VariableType.values()){
             variablesRegex.put(v.name, v);

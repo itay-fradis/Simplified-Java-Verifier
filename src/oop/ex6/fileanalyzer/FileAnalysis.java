@@ -1,8 +1,13 @@
 package oop.ex6.fileanalyzer;
 
+import oop.ex6.component.Method;
+import oop.ex6.component.Variable;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * class for a file analysis
@@ -25,7 +30,7 @@ public class FileAnalysis {
     public static int Analysis(String toRead) {
         try (BufferedReader reader = new BufferedReader(new FileReader(toRead))){
             ScopeAnalysis scopeAnalysis = new ScopeAnalysis();
-            scopeAnalysis.Analyze(null, reader);
+            scopeAnalysis.Analyze(reader);
             return 0;
         }
         catch (IOException e){
