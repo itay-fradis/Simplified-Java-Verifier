@@ -40,15 +40,25 @@ public class ScopeAnalysis {
      */
     private final LinkedList<Scope> scopes;
 
-    private final HashMap<Variable, String> notRecognized;
+    /**
+     * Variables who's assigned by perhaps a global variable, which its name is represented by the string.
+     */
+    private final HashMap<Variable, String> unRecognizedVariables;
+
+    /**
+     * methods who has been called, before their declaration. first string represent the method call name,
+     * and the second one represents the method call arguments.
+     */
+    private final HashMap<String, String> untRecognizedMethods;
 
     /**
      * constructor
      */
     public ScopeAnalysis() {
         scopes = new LinkedList<>();
-        scopes.push(new Scope());
-        notRecognized = new HashMap<>();
+        scopes.push(new Scope(null));
+        unRecognizedVariables = new HashMap<>();
+        untRecognizedMethods = new HashMap<>();
     }
 
     /**
@@ -62,12 +72,16 @@ public class ScopeAnalysis {
         private final Map<String, Variable> variables;
         private final Map<String, Method> methods;
 
+        /** all scopes inside a method, has to have access to the method's given args. */
+        private final Map<String, Variable> givenMethodVariables;
+
         /**
          * Scope constructor
          */
-        private Scope() {
+        private Scope(Map<String, Variable> givenArgs) {
             variables = new HashMap();
             methods = new HashMap();
+            this.givenMethodVariables = givenArgs;
         }
     }
 
@@ -113,7 +127,7 @@ public class ScopeAnalysis {
         switch (detailsL.getType()) {
             case NEW_METHOD:
                 addMethod(detailsL.getMatcher());
-                break;
+                return;
             case CONDITION:
                 checkCondition(detailsL.getMatcher().group(ARGUMENTS));
                 break;
@@ -121,7 +135,7 @@ public class ScopeAnalysis {
                 throw new BadLineFormatException();
                 //case IF:
         }
-        scopes.push(new Scope());
+        scopes.push(new Scope(scopes.getFirst().givenMethodVariables));
     }
 
     /**
@@ -159,21 +173,19 @@ public class ScopeAnalysis {
 
     /**
      * if a variable assigned by another var, it will return's its value.
-     *
      * @param name name of variable
      * @return updated value
      */
     private Variable searchVariable(String name) {
-        for (Scope sc : scopes) {
-            if (sc.variables.containsKey(name))
-                return sc.variables.get(name);
+        for (Scope scope : scopes) {
+            if (scope.variables.containsKey(name))
+                return scope.variables.get(name);
         }
         return null;
     }
 
     /**
      * creates and add method to scope.
-     *
      * @param matcher matcher of line with method-regex
      */
     private void addMethod(Matcher matcher) throws BadLineFormatException {
@@ -183,7 +195,9 @@ public class ScopeAnalysis {
         if (matcher.group(ARGUMENTS).length() == 0) {
             arguments = new String[0];
         }
-        scopes.getFirst().methods.put(mName, MethodFactory.addMethod(mType, mName, arguments));
+        Method newMethod = MethodFactory.addMethod(mType, mName, arguments);
+        scopes.getFirst().methods.put(mName, newMethod);
+        scopes.push(new Scope(newMethod.getVariables()));
     }
 
     /**
@@ -192,9 +206,9 @@ public class ScopeAnalysis {
      * @return - method if exist
      */
     private Method getMethodByName(String name){
-        for (Scope s: scopes){
-            if (s.methods.containsKey(name))
-                return s.methods.get(name);
+        for (Scope scope: scopes){
+            if (scope.methods.containsKey(name))
+                return scope.methods.get(name);
         }
         return null;
     }
@@ -231,7 +245,7 @@ public class ScopeAnalysis {
             throws VariableDeclarationException {
         if (!VariableFactory.isNameLegal(value))
             throw new VariableDeclarationException();
-        if (isValueisGiven(value)) {
+        if (isValueIsGivenFromMethod(value)) {  //todo is not totally right
             scopes.getFirst().variables.put(name,
                     VariableFactory.addVariable(name, null, isFinal, type));
             return;
@@ -244,7 +258,7 @@ public class ScopeAnalysis {
             if (v.getValue() == null){
                 if (scopes.size() == 1)
                     throw new VariableDeclarationException();
-                notRecognized.put(newV, v.getName());
+                unRecognizedVariables.put(newV, v.getName());
             }
             scopes.getFirst().variables.put(name, newV);
             return;
@@ -252,7 +266,7 @@ public class ScopeAnalysis {
         if (scopes.size() == 1)
             throw new VariableDeclarationException();
         Variable newV = VariableFactory.addVariable(name, null, isFinal, type);
-        notRecognized.put(newV, value);
+        unRecognizedVariables.put(newV, value);
         scopes.getFirst().variables.put(name, newV);
     }
 
@@ -268,7 +282,7 @@ public class ScopeAnalysis {
                 addVariables(detailsL.getMatcher());
                 break;
             case METHOD_USAGE:
-                methodUsageCheck(detailsL.getMatcher());
+                analyzeMethodUsage(detailsL.getMatcher());
                 break;
             case RETURN:
                 break;
@@ -277,29 +291,61 @@ public class ScopeAnalysis {
         }
     }
 
-    private void methodUsageCheck(Matcher matcher) throws MethodDeclarationException{
-        Method method = getMethodByName(matcher.group(METHOD_NAME));
-        if (method == null)
-            ///change//
-            throw new MethodDeclarationException();
-        List<Variable> variablesOrder = method.getVariableOrder();
+    /**
+     * parse call for a method
+     * @param matcher of the line with the METHOD USAGE regex.
+     * @throws MethodDeclarationException if it is an illegal method declaration.
+     */
+    private void analyzeMethodUsage(Matcher matcher) throws MethodDeclarationException{
+        String name = matcher.group(METHOD_NAME);
         String arguments = matcher.group(ARGUMENTS);
-        if (arguments.length() == 0 && variablesOrder.size() == 0)
+        Method method = getMethodByName(name);
+        if (method == null) {
+            if (!MethodFactory.isLegalMethodName(name))
+                throw new MethodDeclarationException();
+            untRecognizedMethods.put(name, arguments);
             return;
-        String[] args = matcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
+        }
+        methodArgumentsCheck(name, arguments);
+    }
+
+    /**
+     * check if there is a correlation between the method call arguments, and its declaration.
+     * @param name of method call
+     * @param arguments input arguments by the calling method
+     * @throws MethodDeclarationException if it is an illegal method declaration.
+     */
+    private void methodArgumentsCheck(String name, String arguments) throws MethodDeclarationException{
+        Method method = getMethodByName(name);
+        if (method == null) {
+            throw new MethodDeclarationException();
+        }
+        List<Variable> variablesOrder = method.getVariableOrder();
+        if (arguments.length() == 0 && variablesOrder.size() == 0) //no arguments in method declaration
+            return;
+        String[] args = arguments.split(ARGUMENTS_DELIMITER);
         if (args.length != variablesOrder.size())
             throw new MethodDeclarationException(); // to change exception
-        for (int i = 0; i < variablesOrder.size(); i++ ){
+        checkMethodArgumentsOneByOne(variablesOrder, args);
+    }
+
+    /**
+     * checks each argument of the method call if it is compatible with the method declaration
+     * @param variablesOrder the variables of the method declaration, by order
+     * @param args of the method call
+     * @throws MethodDeclarationException if there is no adjustment between arguments
+     */
+    private void checkMethodArgumentsOneByOne(List<Variable> variablesOrder, String[] args) throws MethodDeclarationException {
+        for (int i = 0; i < variablesOrder.size(); i++) {
             VariableType type = variablesOrder.get(i).getType();
             Matcher m = Pattern.compile(type.getRegex()).matcher(args[i]);
-            if (m.matches())
+            if (m.matches()) // in case the argument is constant value
                 continue;
             Variable globalV = searchVariable(args[i]);
-            if (globalV != null && checkAssignedType(globalV.getType(),
+            if (globalV == null || !checkAssignedType(globalV.getType(),
                     variablesOrder.get(i).getType())) {
-            }
-            else
                 throw new MethodDeclarationException(); //to check
+            }
         }
     }
 
@@ -309,7 +355,7 @@ public class ScopeAnalysis {
      * @param name - name ov value
      * @return - true iff value is given
      */
-    private boolean isValueisGiven(String name){
+    private boolean isValueIsGivenFromMethod(String name){
         for (Scope s: scopes){
             for (Method m: s.methods.values()){
                 if (m.getVariables().containsKey(name))
@@ -322,13 +368,13 @@ public class ScopeAnalysis {
     /**
      * check if variable declaration is legal, and add it. (not completed yet)
      *
-     * @param newVarMatcer matcher
+     * @param newVarMatcher matcher
      * @throws Exception (should be a specific exception).
      */
-    private void addVariables(Matcher newVarMatcer) throws VariableDeclarationException {
-        String finalPrefix = newVarMatcer.group(IS_FINAL);
-        String variableType = newVarMatcer.group(VARIABLE_TYPE);
-        String[] arguments = newVarMatcer.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
+    private void addVariables(Matcher newVarMatcher) throws VariableDeclarationException {
+        String finalPrefix = newVarMatcher.group(IS_FINAL);
+        String variableType = newVarMatcher.group(VARIABLE_TYPE);
+        String[] arguments = newVarMatcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
         Pattern p = Pattern.compile(LineType.VARIABLE_ASSIGNMENT.getRegexPattern());
         for (String str : arguments) {
             Matcher matcher = p.matcher(str.trim());
@@ -336,10 +382,11 @@ public class ScopeAnalysis {
                 throw new VariableDeclarationException();
             String value = matcher.group(VARIABLE_VALUE);
             try {
-                scopes.getFirst().variables.put(matcher.group(VARIABLE_NAME),
-                        VariableFactory.addVariable(matcher.group(VARIABLE_NAME), value,
-                                finalPrefix, variableType));
-            } catch (VariableDeclarationException e) {
+                String varName = matcher.group(VARIABLE_NAME);
+                Variable newVariable = VariableFactory.addVariable(varName, value, finalPrefix, variableType);
+                scopes.getFirst().variables.put(varName, newVariable);
+            }
+            catch (VariableDeclarationException e) {
                 unRecognizedValue(matcher.group(VARIABLE_NAME), variableType, value, finalPrefix);
             }
         }
@@ -363,10 +410,14 @@ public class ScopeAnalysis {
      * checks if all unrecognized variables had been assigned in correct form
      * @throws VariableDeclarationException - iff some unrecognized value is bad
      */
-    private void closedFileChecks() throws VariableDeclarationException{
-        for (Variable v : notRecognized.keySet()){
-            if (!assignmentCheck(v, notRecognized.get(v)))
+    private void closedFileChecks() throws VariableDeclarationException , MethodDeclarationException
+    {
+        for (Variable variable : unRecognizedVariables.keySet()){
+            if (!assignmentCheck(variable, unRecognizedVariables.get(variable)))
                 throw new VariableDeclarationException();
+        }
+        for (String methodName : untRecognizedMethods.keySet()){
+            methodArgumentsCheck(methodName, untRecognizedMethods.get(methodName));
         }
     }
 }

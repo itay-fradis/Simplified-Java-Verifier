@@ -228,12 +228,21 @@ public class testSjava {
 //        assertEquals(1, Sjavac.main(new String[]{"test274.sjava"}));
 
         // 291
-        assertEquals(1, Sjavac.main(new String[]{"test291.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test291.sjava"}));
     }
 
     @Test
     public void test300to400() throws FileNotFoundException {
 
         // 301 - 309
+//        assertEquals(0, Sjavac.main(new String[]{"test301.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test302.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test303.sjava"}));
+//        assertEquals(0, Sjavac.main(new String[]{"test305.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test306.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test307.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test308.sjava"}));
+//        assertEquals(1, Sjavac.main(new String[]{"test309.sjava"}));
+
     }
 }

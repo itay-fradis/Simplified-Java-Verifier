@@ -68,7 +68,7 @@ public class MethodFactory {
      * @param name
      * @return
      */
-    private static boolean isLegalMethodName(String name) {
+    public static boolean isLegalMethodName(String name) {
         Matcher matcher = Pattern.compile(METHOD_NAME_REGEX).matcher(name);
         return matcher.matches();
     }
