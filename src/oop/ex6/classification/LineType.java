@@ -13,7 +13,7 @@ public enum LineType {
 
     CLOSED_SCOPE_LINE("[}]$"),
 
-    EMPTY_LINE(""),
+    EMPTY_LINE("^\\s*$"),
 
     RETURN("^return;$"),
 

@@ -69,9 +69,8 @@ public class ScopeAnalysis {
         /**
          * the scope's methods and variables
          */
-        private final Map<String, Variable> currentVariables;
+        private final Map<String, Variable> variables;
         private final Map<String, Method> methods;
-        private final Map<String, Variable> previousVariables;
 
 
         /** all scopes inside a method, has to have access to the method's given args. */
@@ -81,21 +80,16 @@ public class ScopeAnalysis {
          * Scope constructor
          */
         private Scope(Map<String, Variable> givenArgs) {
-            currentVariables = new HashMap<>();
+            variables = new HashMap<>();
             methods = new HashMap<>();
-            previousVariables = new HashMap<>();
             this.givenMethodVariables = givenArgs;
             if (scopes.size() > 0){
-                Map<String, Variable> current = scopes.getFirst().currentVariables;
-                Map<String, Variable> previous = scopes.getFirst().previousVariables;
-                for (String varName: previous.keySet()){
-                    previousVariables.put(varName, new Variable(previous.get(varName)));
-                }
+                Map<String, Variable> current = scopes.getFirst().variables;
                 for (String varName: current.keySet()){
-                    previousVariables.put(varName, new Variable(current.get(varName)));
+                    variables.put(varName, new Variable(current.get(varName)));
                 }
                 for (String varName: givenArgs.keySet()){
-                    currentVariables.put(varName, new Variable(givenArgs.get(varName)));
+                    variables.put(varName, new Variable(givenArgs.get(varName)));
                 }
             }
         }
@@ -145,25 +139,24 @@ public class ScopeAnalysis {
                 addMethod(detailsL.getMatcher());
                 return;
             case CONDITION:
-                checkCondition(detailsL.getMatcher().group(ARGUMENTS));
+                addCondition(detailsL.getMatcher().group(ARGUMENTS));
                 break;
             default:
                 throw new BadLineFormatException();
                 //case IF:
         }
-        scopes.push(new Scope(scopes.getFirst().givenMethodVariables));
+        scopes.push(new Scope(new HashMap<>()));
     }
 
     /**
      * check if a condition line in correct form
-     *
      * @param arg - arguments in condition
      */
-    private void checkCondition(String arg) throws BadConditionException {
+    private void addCondition(String arg) throws BadConditionException {
         String[] args = arg.split(CONDITION_DELIMITER);
         Pattern p = Pattern.compile(VariableType.BOOLEAN.getRegex());
         for (String str : args) {
-            Matcher matcher = p.matcher(str);
+            Matcher matcher = p.matcher(str.trim());
             if (!matcher.matches() && !checkBoolean(str)) {
                 throw new BadConditionException();
             }
@@ -177,8 +170,8 @@ public class ScopeAnalysis {
      * @return true if valid, false otherwise
      */
     private boolean checkBoolean(String boolParameter) {
-        Variable variable;
-        if ((variable = searchVariable(boolParameter)) != null) {
+        Variable variable = searchVariable(boolParameter);
+        if (variable != null && variable.getValue() != null) {
             VariableType type = variable.getType();
             return type == VariableType.BOOLEAN || type == VariableType.DOUBLE
                     || type == VariableType.INT;
@@ -193,11 +186,8 @@ public class ScopeAnalysis {
      * @return updated value
      */
     private Variable searchVariable(String name) {
-        if (scopes.getFirst().currentVariables.containsKey(name)){
-            return scopes.getFirst().currentVariables.get(name);
-        }
-        if (scopes.getFirst().previousVariables.containsKey(name)){
-            return scopes.getFirst().previousVariables.get(name);
+        if (scopes.getFirst().variables.containsKey(name)){
+            return scopes.getFirst().variables.get(name);
         }
         return null;
     }
@@ -442,16 +432,15 @@ public class ScopeAnalysis {
                 throw new VariableDeclarationException();
             String value = matcher.group(VARIABLE_VALUE);
             String varName = matcher.group(VARIABLE_NAME);
-            if (scopes.getFirst().currentVariables.containsKey(varName)) // check for unique name
+            if (scopes.getFirst().variables.containsKey(varName)) // check for unique name
                 throw  new VariableDeclarationException();
             try {
-
                 Variable newVariable = VariableFactory.addVariable(varName, value, finalPrefix, variableType);
-                scopes.getFirst().currentVariables.put(varName, newVariable);
+                scopes.getFirst().variables.put(varName, newVariable);
             }
             catch (unRecognizedValueException e) {
                 Variable newVariable = VariableFactory.addVariable(varName, null, finalPrefix, variableType);
-                scopes.getFirst().currentVariables.put(varName, newVariable);
+                scopes.getFirst().variables.put(varName, newVariable);
                 unRecognizedValue(newVariable, value);
             }
         }
