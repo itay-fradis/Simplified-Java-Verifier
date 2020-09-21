@@ -13,16 +13,20 @@ public class Method {
     private String name;
 
     /** given variables of method */
-    private Map<String, Variable> givenVariables;
+    private Map <String, Variable> givenVariables;
+
+    /** save variables in entry order*/
+    private List<Variable> variableOrder;
 
     /**
      * constructor
      * @param methodName method's name
-     * @param Map the given list of variables
+     * @param map the given list of variables
      */
-    public Method(String methodName, Map<String, Variable> map){
+    public Method(String methodName, Map<String, Variable> map, List<Variable> order){
         this.name = methodName;
         givenVariables = map;
+        variableOrder = order;
     }
 
     /**
@@ -33,4 +37,5 @@ public class Method {
         return givenVariables;
     }
 
+    public List<Variable> getVariableOrder() {return variableOrder;}
 }

@@ -109,7 +109,6 @@ public class ScopeAnalysis {
      * @throws BadLineFormatException bad method declaration
      */
     private void parseNewScope(String line) throws BadLineFormatException {
-        scopes.push(new Scope());
         LineDetails detailsL = LineClassification.openParenthesisClassify(line);
         switch (detailsL.getType()) {
             case NEW_METHOD:
@@ -122,6 +121,7 @@ public class ScopeAnalysis {
                 throw new BadLineFormatException();
                 //case IF:
         }
+        scopes.push(new Scope());
     }
 
     /**
@@ -187,6 +187,19 @@ public class ScopeAnalysis {
     }
 
     /**
+     * get method by their name
+     * @param name - name of method
+     * @return - method if exist
+     */
+    private Method getMethodByName(String name){
+        for (Scope s: scopes){
+            if (s.methods.containsKey(name))
+                return s.methods.get(name);
+        }
+        return null;
+    }
+
+    /**
      * check if variable assigned to is eligible type
      *
      * @param type - type that value assigned to
@@ -208,7 +221,6 @@ public class ScopeAnalysis {
 
     /**
      * when new variable has a unrecognized value
-     *
      * @param name    - name of new variable
      * @param type    - type of new variable
      * @param value   - value of new variable
@@ -255,6 +267,9 @@ public class ScopeAnalysis {
             case NEW_VARIABLE:
                 addVariables(detailsL.getMatcher());
                 break;
+            case METHOD_USAGE:
+                methodUsageCheck(detailsL.getMatcher());
+                break;
             case RETURN:
                 break;
             default:
@@ -262,6 +277,38 @@ public class ScopeAnalysis {
         }
     }
 
+    private void methodUsageCheck(Matcher matcher) throws MethodDeclarationException{
+        Method method = getMethodByName(matcher.group(METHOD_NAME));
+        if (method == null)
+            ///change//
+            throw new MethodDeclarationException();
+        List<Variable> variablesOrder = method.getVariableOrder();
+        String arguments = matcher.group(ARGUMENTS);
+        if (arguments.length() == 0 && variablesOrder.size() == 0)
+            return;
+        String[] args = matcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
+        if (args.length != variablesOrder.size())
+            throw new MethodDeclarationException(); // to change exception
+        for (int i = 0; i < variablesOrder.size(); i++ ){
+            VariableType type = variablesOrder.get(i).getType();
+            Matcher m = Pattern.compile(type.getRegex()).matcher(args[i]);
+            if (m.matches())
+                continue;
+            Variable globalV = searchVariable(args[i]);
+            if (globalV != null && checkAssignedType(globalV.getType(),
+                    variablesOrder.get(i).getType())) {
+            }
+            else
+                throw new MethodDeclarationException(); //to check
+        }
+    }
+
+
+    /**
+     * checks if value is given in method arguments
+     * @param name - name ov value
+     * @return - true iff value is given
+     */
     private boolean isValueisGiven(String name){
         for (Scope s: scopes){
             for (Method m: s.methods.values()){

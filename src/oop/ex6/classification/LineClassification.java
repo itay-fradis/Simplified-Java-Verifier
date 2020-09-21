@@ -16,7 +16,7 @@ public class LineClassification {
      * types of line end with semi colon
      */
     private static final LineType[] SEMICOLON_TYPES = new LineType[]{
-            LineType.RETURN, LineType.NEW_VARIABLE, LineType.VARIABLE_ASSIGNMENT};
+            LineType.RETURN, LineType.NEW_VARIABLE, LineType.VARIABLE_ASSIGNMENT, LineType.METHOD_USAGE};
 
     /** types of line ends with open parenthesis */
     private static final LineType[] OPEN_PARENTHESIS = new LineType[]{LineType.CONDITION, LineType.NEW_METHOD};
@@ -37,7 +37,7 @@ public class LineClassification {
             if (m.find())
                 return l;
         }
-        return LineType.BAD_LINE;
+        return null;
     }
 
     /**
@@ -52,7 +52,7 @@ public class LineClassification {
             if (matcher.matches())
                 return new LineDetails(lineType, matcher);
         }
-        return new LineDetails(LineType.BAD_LINE, null);
+        return new LineDetails(null, null);
 
     }
 

@@ -19,7 +19,7 @@ public class MethodFactory {
 
     /***/
     private static final String METHOD_ARG_REGEX = "(?<final>^final\\s+)?(?<argType>[\\w]+)" +
-            "\\s+(?<argName>.+)";
+        "\\s+(?<argName>.+)";
 
     /***/
     private static final String ARG_TYPE = "argType";
@@ -35,11 +35,12 @@ public class MethodFactory {
      * @throws MethodDeclarationException
      */
     public static Method addMethod(String methodType, String methodName, String[] arguments)
-            throws MethodDeclarationException, VariableDeclarationException {
+                                    throws MethodDeclarationException, VariableDeclarationException {
         if (!isLegalType(methodType) || !isLegalMethodName(methodName)){
             throw new MethodDeclarationException();
         }
         Map<String, Variable> map = new HashMap<>();
+        List<Variable> order = new ArrayList<>();
         for (String arg: arguments){
             arg = arg.trim();
             Matcher matcher = Pattern.compile(METHOD_ARG_REGEX).matcher(arg);
@@ -51,13 +52,15 @@ public class MethodFactory {
                 if (vType == null || !VariableFactory.isNameLegal(argName) || map.containsKey(argName)){
                     throw new VariableDeclarationException();
                 }
-                map.put(argName, new Variable(vType, argName, isFinal, null));
+                Variable variable = new Variable(vType, argName, isFinal, null);
+                map.put(argName, variable);
+                order.add(variable);
             }
             else{
                 throw new VariableDeclarationException();
             }
         }
-        return new Method(methodName, map);
+        return new Method(methodName, map, order);
     }
 
     /**

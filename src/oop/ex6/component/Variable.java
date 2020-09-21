@@ -56,4 +56,12 @@ public class Variable {
     public String getValue() {
         return value;
     }
+
+    /**
+     * set variable value
+     * @param value - new value
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
 }
