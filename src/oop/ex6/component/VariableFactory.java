@@ -64,8 +64,12 @@ public class VariableFactory {
         }
         Pattern p = Pattern.compile(vType.getRegex());
         Matcher matcher = p.matcher(value);
-        if (!matcher.matches())
+        if (!matcher.matches()) {
+            if (isNameLegal(value)) {
+                throw new unRecognizedValueException();
+            }
             throw new VariableDeclarationException();
+        }
         return new Variable(vType, name, finalPrefix, value);
     }
 

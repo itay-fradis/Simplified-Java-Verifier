@@ -56,7 +56,7 @@ public class ScopeAnalysis {
      */
     public ScopeAnalysis() {
         scopes = new LinkedList<>();
-        scopes.push(new Scope(null));
+        scopes.push(new Scope(new HashMap<>()));
         unRecognizedVariables = new HashMap<>();
         untRecognizedMethods = new HashMap<>();
     }
@@ -239,34 +239,64 @@ public class ScopeAnalysis {
      * @param type    - type of new variable
      * @param value   - value of new variable
      * @param isFinal - is new variable final
-     * @throws VariableDeclarationException iff value is not in correct form
+     * @throws VariableDeclarationException if value is not in correct form
      */
     private void unRecognizedValue(String name, String type, String value, String isFinal)
             throws VariableDeclarationException {
-        if (!VariableFactory.isNameLegal(value))
-            throw new VariableDeclarationException();
-        if (isValueIsGivenFromMethod(value)) {  //todo is not totally right
-            scopes.getFirst().variables.put(name,
-                    VariableFactory.addVariable(name, null, isFinal, type));
+        if (scopes.size() == 1){
+            unRecognizedValueToAssignGlobal(name, type, value, isFinal);
             return;
         }
-        Variable v = searchVariable(value);
-        if (v != null) {
-            if (!checkAssignedType(VariableType.getType(type), v.getType()))
-                throw new VariableDeclarationException();
-            Variable newV = VariableFactory.addVariable(name, v.getValue(), isFinal, type);
-            if (v.getValue() == null){
-                if (scopes.size() == 1)
-                    throw new VariableDeclarationException();
-                unRecognizedVariables.put(newV, v.getName());
-            }
-            scopes.getFirst().variables.put(name, newV);
+        // scope 2 - assign local variables by value
+        if (isValueIsGivenFromMethod(value)) {
+            scopes.getFirst().variables.put(name, VariableFactory.addVariable(name, null, isFinal, type));
             return;
         }
-        if (scopes.size() == 1)
-            throw new VariableDeclarationException();
+        Variable globalVariable = searchVariable(value);
+        if (globalVariable != null) {
+            declaredGlobalToAssignLocalVar(globalVariable, name, type, isFinal);
+            return;
+        }
+        // if global variable has not been declared yet
         Variable newV = VariableFactory.addVariable(name, null, isFinal, type);
         unRecognizedVariables.put(newV, value);
+        scopes.getFirst().variables.put(name, newV);
+    }
+
+    /**
+     * when new local variable assigned with declared global variable
+     * @param variable global variable which assigns local variable
+     * @param name    - name of new variable
+     * @param type    - type of new variable
+     * @param isFinal - is new variable final
+     * @throws VariableDeclarationException if value is not in correct form
+     */
+    private void declaredGlobalToAssignLocalVar(Variable variable, String name, String type, String isFinal)
+                                                throws VariableDeclarationException {
+        if (!checkAssignedType(VariableType.getType(type), variable.getType()))
+            throw new VariableDeclarationException();
+        Variable newV = VariableFactory.addVariable(name, variable.getValue(), isFinal, type);
+        if (variable.getValue() == null){
+            unRecognizedVariables.put(newV, variable.getName());
+        }
+        scopes.getFirst().variables.put(name, newV);
+    }
+
+    /**
+     * when new global variable has a unrecognized value
+     * @param name    - name of new variable
+     * @param type    - type of new variable
+     * @param value   - value of new variable
+     * @param isFinal - is new variable final
+     * @throws VariableDeclarationException iff value is not in correct form
+     */
+    private void unRecognizedValueToAssignGlobal(String name, String type, String value, String isFinal)
+                                        throws VariableDeclarationException {
+        Variable variable = searchVariable(value);
+        if (variable == null || variable.getValue() == null ||
+                !checkAssignedType(VariableType.getType(type), variable.getType()))
+            throw new VariableDeclarationException();
+        Variable newV = VariableFactory.addVariable(name, variable.getValue(), isFinal, type);
         scopes.getFirst().variables.put(name, newV);
     }
 
@@ -352,17 +382,11 @@ public class ScopeAnalysis {
 
     /**
      * checks if value is given in method arguments
-     * @param name - name ov value
+     * @param nameOfValue - name ov value
      * @return - true iff value is given
      */
-    private boolean isValueIsGivenFromMethod(String name){
-        for (Scope s: scopes){
-            for (Method m: s.methods.values()){
-                if (m.getVariables().containsKey(name))
-                    return true;
-            }
-        }
-        return false;
+    private boolean isValueIsGivenFromMethod(String nameOfValue){
+        return scopes.getFirst().givenMethodVariables.containsKey(nameOfValue);
     }
 
     /**
@@ -386,7 +410,7 @@ public class ScopeAnalysis {
                 Variable newVariable = VariableFactory.addVariable(varName, value, finalPrefix, variableType);
                 scopes.getFirst().variables.put(varName, newVariable);
             }
-            catch (VariableDeclarationException e) {
+            catch (unRecognizedValueException e) {
                 unRecognizedValue(matcher.group(VARIABLE_NAME), variableType, value, finalPrefix);
             }
         }
