@@ -16,7 +16,7 @@ public class LineClassification {
      * types of line end with semi colon
      */
     private static final LineType[] SEMICOLON_TYPES = new LineType[]{
-            LineType.RETURN, LineType.NEW_VARIABLE, LineType.VARIABLE_ASSIGNMENT, LineType.METHOD_USAGE};
+            LineType.RETURN, LineType.METHOD_USAGE, LineType.VARIABLE_ASSIGNMENT, LineType.NEW_VARIABLE};
 
     /** types of line ends with open parenthesis */
     private static final LineType[] OPEN_PARENTHESIS = new LineType[]{LineType.CONDITION, LineType.NEW_METHOD};

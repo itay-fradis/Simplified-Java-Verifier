@@ -23,9 +23,9 @@ public enum LineType {
     NEW_METHOD("(?<methodType>[^\\s]+)\\s+(?<methodName>[^\\(\\s]+)" +
             "\\s*\\((?<arguments>.*)\\)\\s*\\{"),
 
-    NEW_VARIABLE("(?<final>^final\\s+)?(?<variableType>[\\w]+)?\\s+(?<arguments>[^;]+);"),
+    NEW_VARIABLE("(?<final>^final\\s+)?(?<variableType>[\\w]+)\\s+(?<arguments>[^;]+);"),
 
-    VARIABLE_ASSIGNMENT("(?<variableName>[^;=\\s]+)(\\s*=\\s*(?<variableValue>.*))?"),
+    VARIABLE_ASSIGNMENT("(?<variableName>[^;=\\s]+)(\\s*=\\s*(?<variableValue>[^;]+))?;?"),
 
     METHOD_USAGE("(?<methodName>[^\\s\\(]+)\\s*\\((?<arguments>[^\\)]*)\\);$");
 

@@ -235,69 +235,58 @@ public class ScopeAnalysis {
 
     /**
      * when new variable has a unrecognized value
-     * @param name    - name of new variable
-     * @param type    - type of new variable
      * @param value   - value of new variable
-     * @param isFinal - is new variable final
      * @throws VariableDeclarationException if value is not in correct form
      */
-    private void unRecognizedValue(String name, String type, String value, String isFinal)
-            throws VariableDeclarationException {
+    private void unRecognizedValue(Variable variable, String value)
+            throws VariableUsageException {
         if (scopes.size() == 1){
-            unRecognizedValueToAssignGlobal(name, type, value, isFinal);
+            unRecognizedValueToAssignGlobal(variable, value);
             return;
         }
         // scope 2 - assign local variables by value
         if (isValueIsGivenFromMethod(value)) {
-            scopes.getFirst().variables.put(name, VariableFactory.addVariable(name, null, isFinal, type));
             return;
         }
         Variable globalVariable = searchVariable(value);
         if (globalVariable != null) {
-            declaredGlobalToAssignLocalVar(globalVariable, name, type, isFinal);
+            declaredGlobalToAssignLocalVar(globalVariable, variable);
             return;
         }
         // if global variable has not been declared yet
-        Variable newV = VariableFactory.addVariable(name, null, isFinal, type);
-        unRecognizedVariables.put(newV, value);
-        scopes.getFirst().variables.put(name, newV);
+        unRecognizedVariables.put(variable, value);
     }
 
     /**
      * when new local variable assigned with declared global variable
-     * @param variable global variable which assigns local variable
-     * @param name    - name of new variable
-     * @param type    - type of new variable
-     * @param isFinal - is new variable final
+     * @param globalVariable global variable which assigns local variable
+     * @param variable variable which we assign
      * @throws VariableDeclarationException if value is not in correct form
      */
-    private void declaredGlobalToAssignLocalVar(Variable variable, String name, String type, String isFinal)
-                                                throws VariableDeclarationException {
-        if (!checkAssignedType(VariableType.getType(type), variable.getType()))
-            throw new VariableDeclarationException();
-        Variable newV = VariableFactory.addVariable(name, variable.getValue(), isFinal, type);
-        if (variable.getValue() == null){
-            unRecognizedVariables.put(newV, variable.getName());
+    private void declaredGlobalToAssignLocalVar(Variable globalVariable, Variable variable)
+                                                throws VariableUsageException {
+        if (!checkAssignedType(variable.getType(), globalVariable.getType()))
+            throw new VariableUsageException();
+        if (globalVariable.getValue() == null){
+            unRecognizedVariables.put(variable, globalVariable.getName());
+            return;
         }
-        scopes.getFirst().variables.put(name, newV);
+        variable.setValue(globalVariable.getValue());
+
     }
 
     /**
      * when new global variable has a unrecognized value
-     * @param name    - name of new variable
-     * @param type    - type of new variable
      * @param value   - value of new variable
-     * @param isFinal - is new variable final
      * @throws VariableDeclarationException iff value is not in correct form
      */
-    private void unRecognizedValueToAssignGlobal(String name, String type, String value, String isFinal)
-                                        throws VariableDeclarationException {
-        Variable variable = searchVariable(value);
-        if (variable == null || variable.getValue() == null ||
-                !checkAssignedType(VariableType.getType(type), variable.getType()))
-            throw new VariableDeclarationException();
-        Variable newV = VariableFactory.addVariable(name, variable.getValue(), isFinal, type);
-        scopes.getFirst().variables.put(name, newV);
+    private void unRecognizedValueToAssignGlobal(Variable variable, String value)
+                                        throws unRecognizedValueException {
+        Variable other = searchVariable(value);
+        if (other == null || other.getValue() == null ||
+                !checkAssignedType(variable.getType(), other.getType()))
+            throw new unRecognizedValueException();
+        variable.setValue(other.getValue());
     }
 
     /**
@@ -316,9 +305,38 @@ public class ScopeAnalysis {
                 break;
             case RETURN:
                 break;
+            case VARIABLE_ASSIGNMENT:
+                String name = detailsL.getMatcher().group(VARIABLE_NAME);
+                String value = detailsL.getMatcher().group(VARIABLE_VALUE);
+                assignVariables(name, value);
+                break;
             default:
                 throw new BadLineFormatException();
         }
+    }
+
+    /**
+     * assign a variable to a value
+     * @param name - name of variable
+     * @param value - value of variable
+     * @throws VariableUsageException - iff value is not in correct form
+     */
+    private void assignVariables(String name, String value) throws VariableUsageException {
+        Variable variable = searchVariable(name);
+        if (variable == null)
+            throw new VariableUsageException();
+        Pattern p = Pattern.compile(variable.getType().getRegex());
+        Matcher m = p.matcher(value);
+        if (m.matches()){
+            variable.setValue(value);
+            return;
+        }
+        if (VariableFactory.isNameLegal(value))
+            unRecognizedValue(variable, value);
+        else
+            throw new unRecognizedValueException();
+
+
     }
 
     /**
@@ -405,13 +423,16 @@ public class ScopeAnalysis {
             if (!matcher.matches())
                 throw new VariableDeclarationException();
             String value = matcher.group(VARIABLE_VALUE);
+            String varName = matcher.group(VARIABLE_NAME);
             try {
-                String varName = matcher.group(VARIABLE_NAME);
+
                 Variable newVariable = VariableFactory.addVariable(varName, value, finalPrefix, variableType);
                 scopes.getFirst().variables.put(varName, newVariable);
             }
             catch (unRecognizedValueException e) {
-                unRecognizedValue(matcher.group(VARIABLE_NAME), variableType, value, finalPrefix);
+                Variable newVariable = VariableFactory.addVariable(varName, null, finalPrefix, variableType);
+                scopes.getFirst().variables.put(varName, newVariable);
+                unRecognizedValue(newVariable, value);
             }
         }
     }
