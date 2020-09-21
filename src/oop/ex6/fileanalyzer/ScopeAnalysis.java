@@ -38,6 +38,8 @@ public class ScopeAnalysis {
      */
     private final LinkedList<Scope> scopes;
 
+
+
     /**
      * constructor
      */
@@ -162,7 +164,7 @@ public class ScopeAnalysis {
      * creates and add method to scope.
      * @param matcher matcher of line with method-regex
      */
-    private void addMethod(Matcher matcher) throws BadLineFormatException {
+    private void addMethod(Matcher matcher) throws BadLineFormatException { //todo add method variables to the relevant scope.
         String mType = matcher.group(METHOD_TYPE);
         String mName = matcher.group(METHOD_NAME);
         String[] arguments = matcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
@@ -177,7 +179,7 @@ public class ScopeAnalysis {
      * parse normal line which ends with semicolon.
      * @param line line to be parsed
      */
-    private void parseNormalLine(String line) throws BadLineFormatException {
+    private void parseNormalLine(String line) throws BadLineFormatException { //todo add case of assignment
         LineDetails detailsL = LineClassification.SemiColonClassify(line);
         switch (detailsL.getType()){
             case NEW_VARIABLE:
@@ -192,17 +194,17 @@ public class ScopeAnalysis {
 
     /**
      * check if variable declaration is legal, and add it. (not completed yet)
-     * @param newVarMatcer matcher
+     * @param newVarMatcher matcher
      * @throws Exception (should be a specific exception).
      */
-    private void addVariables(Matcher newVarMatcer) throws VariableDeclarationException {
-        String finalPrefix = newVarMatcer.group(IS_FINAL);
-        String variableType = newVarMatcer.group(VARIABLE_TYPE);
-        String[] arguments = newVarMatcer.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
+    private void addVariables(Matcher newVarMatcher) throws VariableDeclarationException {
+        String finalPrefix = newVarMatcher.group(IS_FINAL);
+        String variableType = newVarMatcher.group(VARIABLE_TYPE);
+        String[] arguments = newVarMatcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
         Pattern p = Pattern.compile(LineType.VARIABLE_ASSIGNMENT.getRegexPattern());
         for (String str: arguments){
             Matcher matcher = p.matcher(str.trim());
-            if (matcher.matches()) {
+            if (matcher.matches()) { //todo check if there is another variable with the same name in the same scope.
                 String value = matcher.group(VARIABLE_VALUE);
                 value = checkIfAssignedByVariable(value);
                 scopes.getFirst().variables.put(matcher.group(VARIABLE_NAME),
@@ -233,5 +235,6 @@ public class ScopeAnalysis {
 
         return value;
     }
+
 
 }
