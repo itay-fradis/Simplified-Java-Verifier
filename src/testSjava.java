@@ -307,6 +307,7 @@ public class testSjava {
         // 440 - 441
         assertEquals(1, Sjavac.main(new String[]{"test440.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"test441.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test442.sjava"}));
 
         // 451 - 459
         assertEquals(0, Sjavac.main(new String[]{"test451.sjava"}));

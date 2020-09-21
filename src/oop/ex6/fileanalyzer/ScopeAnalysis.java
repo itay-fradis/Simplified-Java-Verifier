@@ -70,6 +70,7 @@ public class ScopeAnalysis {
          * the scope's methods and variables
          */
         private final Map<String, Variable> variables;
+        private final Map<String, Variable> preVariables;
         private final Map<String, Method> methods;
 
 
@@ -81,12 +82,17 @@ public class ScopeAnalysis {
          */
         private Scope(Map<String, Variable> givenArgs) {
             variables = new HashMap<>();
+            preVariables = new HashMap<>();
             methods = new HashMap<>();
             this.givenMethodVariables = givenArgs;
             if (scopes.size() > 0){
+                Map<String, Variable> previous = scopes.getFirst().preVariables;
                 Map<String, Variable> current = scopes.getFirst().variables;
+                for (String varName: previous.keySet()){
+                    preVariables.put(varName, new Variable(previous.get(varName)));
+                }
                 for (String varName: current.keySet()){
-                    variables.put(varName, new Variable(current.get(varName)));
+                    preVariables.put(varName, new Variable(current.get(varName)));
                 }
                 for (String varName: givenArgs.keySet()){
                     variables.put(varName, new Variable(givenArgs.get(varName)));
@@ -128,7 +134,6 @@ public class ScopeAnalysis {
 
     /**
      * parse new Scope.
-     *
      * @param line given line to parse
      * @throws BadLineFormatException bad method declaration
      */
@@ -188,6 +193,9 @@ public class ScopeAnalysis {
     private Variable searchVariable(String name) {
         if (scopes.getFirst().variables.containsKey(name)){
             return scopes.getFirst().variables.get(name);
+        }
+        if (scopes.getFirst().preVariables.containsKey(name)){
+            return scopes.getFirst().preVariables.get(name);
         }
         return null;
     }
@@ -359,7 +367,7 @@ public class ScopeAnalysis {
         if (method == null) {
             if (!MethodFactory.isLegalMethodName(name))
                 throw new MethodDeclarationException();
-            untRecognizedMethods.put(name, arguments);
+            untRecognizedMethods.put(name, arguments.trim());
             return;
         }
         methodArgumentsCheck(name, arguments);
@@ -394,10 +402,10 @@ public class ScopeAnalysis {
     private void checkMethodArgumentsOneByOne(List<Variable> variablesOrder, String[] args) throws MethodDeclarationException {
         for (int i = 0; i < variablesOrder.size(); i++) {
             VariableType type = variablesOrder.get(i).getType();
-            Matcher m = Pattern.compile(type.getRegex()).matcher(args[i]);
+            Matcher m = Pattern.compile(type.getRegex()).matcher(args[i].trim());
             if (m.matches()) // in case the argument is constant value
                 continue;
-            Variable globalV = searchVariable(args[i]);
+            Variable globalV = searchVariable(args[i].trim());
             if (globalV == null || !checkAssignedType(globalV.getType(),
                     variablesOrder.get(i).getType())) {
                 throw new MethodDeclarationException(); //to check
