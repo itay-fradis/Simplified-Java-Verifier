@@ -1,9 +1,6 @@
 package oop.ex6.component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +19,7 @@ public class MethodFactory {
 
     /***/
     private static final String METHOD_ARG_REGEX = "(?<final>^final\\s+)?(?<argType>[\\w]+)" +
-        "\\s+(?<argName>.+)";
+            "\\s+(?<argName>.+)";
 
     /***/
     private static final String ARG_TYPE = "argType";
@@ -38,12 +35,11 @@ public class MethodFactory {
      * @throws MethodDeclarationException
      */
     public static Method addMethod(String methodType, String methodName, String[] arguments)
-                                    throws MethodDeclarationException, VariableDeclarationException {
+            throws MethodDeclarationException, VariableDeclarationException {
         if (!isLegalType(methodType) || !isLegalMethodName(methodName)){
             throw new MethodDeclarationException();
         }
-        List<Variable> list = new ArrayList<>();
-        Set<String> variablesUniqueNames = new HashSet<>();
+        Map<String, Variable> map = new HashMap<>();
         for (String arg: arguments){
             arg = arg.trim();
             Matcher matcher = Pattern.compile(METHOD_ARG_REGEX).matcher(arg);
@@ -52,17 +48,16 @@ public class MethodFactory {
                 String argType = matcher.group(ARG_TYPE);
                 String argName = matcher.group(ARG_NAME);
                 VariableType vType = VariableType.getType(argType);
-                if (vType == null || !VariableFactory.isNameLegal(argName) || variablesUniqueNames.contains(argName)){
+                if (vType == null || !VariableFactory.isNameLegal(argName) || map.containsKey(argName)){
                     throw new VariableDeclarationException();
                 }
-                variablesUniqueNames.add(argName);
-                list.add(new Variable(vType, argName, isFinal, null));
+                map.put(argName, new Variable(vType, argName, isFinal, null));
             }
             else{
                 throw new VariableDeclarationException();
             }
         }
-        return new Method(methodName, list);
+        return new Method(methodName, map);
     }
 
     /**
