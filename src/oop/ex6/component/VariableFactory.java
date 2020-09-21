@@ -73,6 +73,4 @@ public class VariableFactory {
         return new Variable(vType, name, finalPrefix, value);
     }
 
-
-
 }

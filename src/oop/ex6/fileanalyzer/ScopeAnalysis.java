@@ -69,8 +69,10 @@ public class ScopeAnalysis {
         /**
          * the scope's methods and variables
          */
-        private final Map<String, Variable> variables;
+        private final Map<String, Variable> currentVariables;
         private final Map<String, Method> methods;
+        private final Map<String, Variable> previousVariables;
+
 
         /** all scopes inside a method, has to have access to the method's given args. */
         private final Map<String, Variable> givenMethodVariables;
@@ -79,9 +81,23 @@ public class ScopeAnalysis {
          * Scope constructor
          */
         private Scope(Map<String, Variable> givenArgs) {
-            variables = new HashMap();
-            methods = new HashMap();
+            currentVariables = new HashMap<>();
+            methods = new HashMap<>();
+            previousVariables = new HashMap<>();
             this.givenMethodVariables = givenArgs;
+            if (scopes.size() > 0){
+                Map<String, Variable> current = scopes.getFirst().currentVariables;
+                Map<String, Variable> previous = scopes.getFirst().previousVariables;
+                for (String varName: previous.keySet()){
+                    previousVariables.put(varName, new Variable(previous.get(varName)));
+                }
+                for (String varName: current.keySet()){
+                    previousVariables.put(varName, new Variable(current.get(varName)));
+                }
+                for (String varName: givenArgs.keySet()){
+                    currentVariables.put(varName, new Variable(givenArgs.get(varName)));
+                }
+            }
         }
     }
 
@@ -177,9 +193,11 @@ public class ScopeAnalysis {
      * @return updated value
      */
     private Variable searchVariable(String name) {
-        for (Scope scope : scopes) {
-            if (scope.variables.containsKey(name))
-                return scope.variables.get(name);
+        if (scopes.getFirst().currentVariables.containsKey(name)){
+            return scopes.getFirst().currentVariables.get(name);
+        }
+        if (scopes.getFirst().previousVariables.containsKey(name)){
+            return scopes.getFirst().previousVariables.get(name);
         }
         return null;
     }
@@ -323,7 +341,7 @@ public class ScopeAnalysis {
      */
     private void assignVariables(String name, String value) throws VariableUsageException {
         Variable variable = searchVariable(name);
-        if (variable == null)
+        if (variable == null || variable.isFinal())
             throw new VariableUsageException();
         Pattern p = Pattern.compile(variable.getType().getRegex());
         Matcher m = p.matcher(value);
@@ -424,14 +442,16 @@ public class ScopeAnalysis {
                 throw new VariableDeclarationException();
             String value = matcher.group(VARIABLE_VALUE);
             String varName = matcher.group(VARIABLE_NAME);
+            if (scopes.getFirst().currentVariables.containsKey(varName)) // check for unique name
+                throw  new VariableDeclarationException();
             try {
 
                 Variable newVariable = VariableFactory.addVariable(varName, value, finalPrefix, variableType);
-                scopes.getFirst().variables.put(varName, newVariable);
+                scopes.getFirst().currentVariables.put(varName, newVariable);
             }
             catch (unRecognizedValueException e) {
                 Variable newVariable = VariableFactory.addVariable(varName, null, finalPrefix, variableType);
-                scopes.getFirst().variables.put(varName, newVariable);
+                scopes.getFirst().currentVariables.put(varName, newVariable);
                 unRecognizedValue(newVariable, value);
             }
         }

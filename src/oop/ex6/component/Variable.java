@@ -30,6 +30,17 @@ public class Variable {
     }
 
     /**
+     * copy constructor
+     * @param rhs variable to be copied
+     */
+    public Variable(Variable rhs){
+        this.type = rhs.type;
+        this.name = rhs.name;
+        this.isFinal = rhs.isFinal;
+        this.value = rhs.value;
+    }
+
+    /**
      * @return type
      */
     public VariableType getType() {
