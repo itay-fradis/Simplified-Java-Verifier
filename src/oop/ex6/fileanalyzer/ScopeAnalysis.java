@@ -49,7 +49,7 @@ public class ScopeAnalysis {
      * methods who has been called, before their declaration. first string represent the method call name,
      * and the second one represents the method call arguments.
      */
-    private final HashMap<String, String> untRecognizedMethods;
+    private final HashMap<String, String[]> untRecognizedMethods;
 
     /**
      * constructor
@@ -77,6 +77,8 @@ public class ScopeAnalysis {
         /** all scopes inside a method, has to have access to the method's given args. */
         private final Map<String, Variable> givenMethodVariables;
 
+        private boolean isInsideMethod = false;
+
         /**
          * Scope constructor
          */
@@ -97,6 +99,7 @@ public class ScopeAnalysis {
                 for (String varName: givenArgs.keySet()){
                     variables.put(varName, new Variable(givenArgs.get(varName)));
                 }
+                isInsideMethod = scopes.getFirst().isInsideMethod;
             }
         }
     }
@@ -130,6 +133,13 @@ public class ScopeAnalysis {
             }
         }
         closedFileChecks();
+        checkClosingParenthesis();
+    }
+
+    private void checkClosingParenthesis() throws BadLineFormatException {
+        if (scopes.size() > 1){
+            throw new BadLineFormatException();
+        }
     }
 
     /**
@@ -161,7 +171,8 @@ public class ScopeAnalysis {
         String[] args = arg.split(CONDITION_DELIMITER);
         Pattern p = Pattern.compile(VariableType.BOOLEAN.getRegex());
         for (String str : args) {
-            Matcher matcher = p.matcher(str.trim());
+            str = str.trim();
+            Matcher matcher = p.matcher(str);
             if (!matcher.matches() && !checkBoolean(str)) {
                 throw new BadConditionException();
             }
@@ -214,6 +225,7 @@ public class ScopeAnalysis {
         Method newMethod = MethodFactory.addMethod(mType, mName, arguments);
         scopes.getFirst().methods.put(mName, newMethod);
         scopes.push(new Scope(newMethod.getVariables()));
+        scopes.getFirst().isInsideMethod = true;
     }
 
     /**
@@ -361,16 +373,38 @@ public class ScopeAnalysis {
      * @throws MethodDeclarationException if it is an illegal method declaration.
      */
     private void analyzeMethodUsage(Matcher matcher) throws MethodDeclarationException{
+        if (!scopes.getFirst().isInsideMethod){
+            throw new MethodDeclarationException();
+        }
         String name = matcher.group(METHOD_NAME);
-        String arguments = matcher.group(ARGUMENTS);
+        String arguments = matcher.group(ARGUMENTS).trim();
         Method method = getMethodByName(name);
         if (method == null) {
             if (!MethodFactory.isLegalMethodName(name))
                 throw new MethodDeclarationException();
-            untRecognizedMethods.put(name, arguments.trim());
+            untRecognizedMethods.put(name, getLocalVariables(arguments));
             return;
         }
-        methodArgumentsCheck(name, arguments);
+        methodArgumentsCheck(name, arguments.split(ARGUMENTS_DELIMITER));
+    }
+
+    /**
+     * get values from local variables
+     * @param arguments - arguments to parse
+     * @return - a list of updated values
+     * @throws MethodDeclarationException - iff there is an uninitialized variable
+     */
+    private String[] getLocalVariables(String arguments) throws MethodDeclarationException{
+        String[] args = arguments.split(ARGUMENTS_DELIMITER);
+        for (int i = 0; i < args.length; i++){
+            Variable variable = searchVariable(args[i]);
+            if (variable != null){
+                if (variable.getValue() == null)
+                    throw new MethodDeclarationException();
+                args[i] = variable.getValue();
+            }
+        }
+        return args;
     }
 
     /**
@@ -379,18 +413,17 @@ public class ScopeAnalysis {
      * @param arguments input arguments by the calling method
      * @throws MethodDeclarationException if it is an illegal method declaration.
      */
-    private void methodArgumentsCheck(String name, String arguments) throws MethodDeclarationException{
+    private void methodArgumentsCheck(String name, String[] arguments) throws MethodDeclarationException{
         Method method = getMethodByName(name);
         if (method == null) {
             throw new MethodDeclarationException();
         }
         List<Variable> variablesOrder = method.getVariableOrder();
-        if (arguments.length() == 0 && variablesOrder.size() == 0) //no arguments in method declaration
+        if (arguments.length == 1 && arguments[0].length() == 0 && variablesOrder.size() == 0) //no arguments in method declaration
             return;
-        String[] args = arguments.split(ARGUMENTS_DELIMITER);
-        if (args.length != variablesOrder.size())
+        if (arguments.length != variablesOrder.size())
             throw new MethodDeclarationException(); // to change exception
-        checkMethodArgumentsOneByOne(variablesOrder, args);
+        checkMethodArgumentsOneByOne(variablesOrder, arguments);
     }
 
     /**
@@ -439,6 +472,8 @@ public class ScopeAnalysis {
             if (!matcher.matches())
                 throw new VariableDeclarationException();
             String value = matcher.group(VARIABLE_VALUE);
+            if (value != null && VariableFactory.isNameLegal(value))
+                value = getValueFromVariable(value);
             String varName = matcher.group(VARIABLE_NAME);
             if (scopes.getFirst().variables.containsKey(varName)) // check for unique name
                 throw  new VariableDeclarationException();
@@ -452,6 +487,18 @@ public class ScopeAnalysis {
                 unRecognizedValue(newVariable, value);
             }
         }
+    }
+
+    /**
+     * a method for get a value from a name of variable
+     * @param value - name to look for
+     * @return - value if found a variable
+     */
+    private String getValueFromVariable(String value) {
+        Variable variable = searchVariable(value);
+        if (variable != null && variable.getValue() != null)
+            return variable.getValue();
+        return value;
     }
 
     /**
