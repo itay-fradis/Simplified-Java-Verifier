@@ -9,9 +9,9 @@ public enum VariableType {
 
     // Variable value patterns
     INT("int", "^([-]?[1-9]\\d*|0)$"),
-    DOUBLE("double", "(^([-]?[1-9]\\d*|0)(\\.\\d+))$" + "|" + INT.getRegex()),
+    DOUBLE("double", "(^[-]?[\\d]*\\.\\d*)" + "|" + INT.getRegex()),
     STRING("String", "(\".*\")"),
-    BOOLEAN("boolean", "(^true$|^false$)" + "|" + INT.getRegex() + "|" + DOUBLE.getRegex()),
+    BOOLEAN("boolean", "(^true$|^false$)"  + "|" + DOUBLE.getRegex()),
     CHAR("char", "('.{1}')");
 
     /** the value's regex */

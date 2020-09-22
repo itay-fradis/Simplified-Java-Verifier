@@ -53,6 +53,7 @@ public class MethodFactory {
                     throw new VariableDeclarationException();
                 }
                 Variable variable = new Variable(vType, argName, isFinal, null);
+                variable.setVarToBeMethodArg();
                 map.put(argName, variable);
                 order.add(variable);
             }

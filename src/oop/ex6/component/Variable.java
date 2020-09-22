@@ -12,6 +12,8 @@ public class Variable {
     private boolean isFinal = false;
     /** value of variable */
     private String value;
+    /** flag that indicates if that variable is a method argument*/
+    private boolean isMethodArgument = false;
 
 
     /**
@@ -38,6 +40,7 @@ public class Variable {
         this.name = rhs.name;
         this.isFinal = rhs.isFinal;
         this.value = rhs.value;
+        this.isMethodArgument = rhs.isMethodArgument;
     }
 
     /**
@@ -74,5 +77,19 @@ public class Variable {
      */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+     * set isMethodArgument field to be true
+     */
+    public void setVarToBeMethodArg(){
+        isMethodArgument = true;
+    }
+
+    /**
+     * @return if this variable is a method argument
+     */
+    public boolean isMethodArg(){
+        return isMethodArgument;
     }
 }

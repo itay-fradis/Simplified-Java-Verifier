@@ -31,6 +31,7 @@ public class Classifier {
     /**
      * @param value given value.
      * @return the type which fits to the given value.
+     * @throws IllegalValueException bad value
      */
     public static VariableType classifyValue(String value) throws IllegalValueException {
         if (value == null) {

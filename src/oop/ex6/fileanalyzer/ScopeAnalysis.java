@@ -29,7 +29,7 @@ public class ScopeAnalysis {
 
     private static final String ARGUMENTS_DELIMITER = ",";
 
-    private static final String CONDITION_DELIMITER = "(\\|{2}|\\&{2})";
+    private static final String CONDITION_DELIMITER = "(\\|{2}|&{2})";
 
     private static final String METHOD_TYPE = "methodType";
 
@@ -139,6 +139,10 @@ public class ScopeAnalysis {
         checkClosingParenthesis();
     }
 
+    /**
+     * checks if for each open parenthesis there is a close one.
+     * @throws BadLineFormatException
+     */
     private void checkClosingParenthesis() throws BadLineFormatException {
         if (scopes.size() > 1){
             throw new BadLineFormatException();
@@ -191,11 +195,10 @@ public class ScopeAnalysis {
      */
     private boolean checkBoolean(String boolParameter) {
         Variable variable = searchVariable(boolParameter);
-        if (variable != null && variable.getValue() != null) {
+        if (variable != null && (variable.getValue() != null || variable.isMethodArg())) {
             VariableType type = variable.getType();
             return type == VariableType.BOOLEAN || type == VariableType.DOUBLE
                     || type == VariableType.INT;
-            /// to add if boolean is initialized
         }
         return false;
     }
@@ -203,7 +206,7 @@ public class ScopeAnalysis {
     /**
      * if a variable assigned by another var, it will return's its value.
      * @param name name of variable
-     * @return updated value
+     * @return updated variable
      */
     private Variable searchVariable(String name) {
         if (scopes.getFirst().variables.containsKey(name)){
@@ -220,10 +223,13 @@ public class ScopeAnalysis {
      * @param matcher matcher of line with method-regex
      */
     private void addMethod(Matcher matcher) throws BadLineFormatException {
+        if (scopes.size() > 1) {
+            throw new BadLineFormatException();
+        }
         String mType = matcher.group(METHOD_TYPE);
         String mName = matcher.group(METHOD_NAME);
         String[] arguments = matcher.group(ARGUMENTS).split(ARGUMENTS_DELIMITER);
-        if (matcher.group(ARGUMENTS).length() == 0) {
+        if (matcher.group(ARGUMENTS).length() == 0) { // if there is no args, makes arguments to be empty array.
             arguments = new String[0];
         }
         Method newMethod = MethodFactory.addMethod(mType, mName, arguments);
@@ -238,16 +244,14 @@ public class ScopeAnalysis {
      * @return - method if exist
      */
     private Method getMethodByName(String name){
-        for (Scope scope: scopes){
-            if (scope.methods.containsKey(name))
-                return scope.methods.get(name);
+        if (scopes.getLast().methods.containsKey(name)){
+            return scopes.getLast().methods.get(name);
         }
         return null;
     }
 
     /**
      * check if variable assigned to is eligible type
-     *
      * @param type - type that value assigned to
      * @param other - type that should fit our type
      * @return - true iff assignment is eligible
@@ -266,7 +270,7 @@ public class ScopeAnalysis {
     }
 
     /**
-     * when new variable has a unrecognized value
+     * when new variable has an unrecognized value
      * @param value   - value of new variable
      * @throws VariableDeclarationException if value is not in correct form
      */
@@ -276,7 +280,7 @@ public class ScopeAnalysis {
             unRecognizedValueToAssignGlobal(variable, value);
             return;
         }
-        // scope 2 - assign local variables by value
+        // scope 2 or more - assign local variables by value
         if (isValueIsGivenFromMethod(value)) {
             return;
         }
@@ -293,7 +297,7 @@ public class ScopeAnalysis {
      * when new local variable assigned with declared global variable
      * @param globalVariable global variable which assigns local variable
      * @param variable variable which we assign
-     * @throws VariableDeclarationException if value is not in correct form
+     * @throws VariableUsageException if value is not in correct form
      */
     private void declaredGlobalToAssignLocalVar(Variable globalVariable, Variable variable)
                                                 throws VariableUsageException {
@@ -308,9 +312,9 @@ public class ScopeAnalysis {
     }
 
     /**
-     * when new global variable has a unrecognized value
+     * when new global variable has an unrecognized value
      * @param value   - value of new variable
-     * @throws VariableDeclarationException iff value is not in correct form
+     * @throws unRecognizedValueException if value is not in correct form
      */
     private void unRecognizedValueToAssignGlobal(Variable variable, String value)
                                         throws unRecognizedValueException {
@@ -323,7 +327,6 @@ public class ScopeAnalysis {
 
     /**
      * parse normal line which ends with semicolon.
-     *
      * @param line line to be parsed
      */
     private void parseNormalLine(String line) throws BadLineFormatException {
@@ -348,10 +351,10 @@ public class ScopeAnalysis {
     }
 
     /**
-     * assign a variable to a value
+     * assign a value to a variable
      * @param name - name of variable
      * @param value - value of variable
-     * @throws VariableUsageException - iff value is not in correct form
+     * @throws VariableUsageException - if value is not in correct form
      */
     private void assignVariables(String name, String value) throws VariableUsageException {
         Variable variable = searchVariable(name);
@@ -376,7 +379,7 @@ public class ScopeAnalysis {
      * @param matcher of the line with the METHOD USAGE regex.
      * @throws MethodDeclarationException if it is an illegal method declaration.
      */
-    private void analyzeMethodUsage(Matcher matcher) throws MethodDeclarationException{
+    private void analyzeMethodUsage(Matcher matcher) throws MethodDeclarationException, VariableUsageException {
         if (!scopes.getFirst().isInsideMethod){
             throw new MethodDeclarationException();
         }
@@ -393,18 +396,15 @@ public class ScopeAnalysis {
     }
 
     /**
-     * get values from local variables
+     * get values of the local variables which were given in a method call
      * @param arguments - arguments to parse
      * @return - a list of updated values
-     * @throws MethodDeclarationException - iff there is an uninitialized variable
      */
-    private String[] getLocalVariables(String arguments) throws MethodDeclarationException{
+    private String[] getLocalVariables(String arguments) {
         String[] args = arguments.split(ARGUMENTS_DELIMITER);
         for (int i = 0; i < args.length; i++){
             Variable variable = searchVariable(args[i]);
-            if (variable != null){
-                if (variable.getValue() == null)
-                    throw new MethodDeclarationException();
+            if (variable != null && variable.getValue() != null){
                 args[i] = variable.getValue();
             }
         }
@@ -417,7 +417,7 @@ public class ScopeAnalysis {
      * @param arguments input arguments by the calling method
      * @throws MethodDeclarationException if it is an illegal method declaration.
      */
-    private void methodArgumentsCheck(String name, String[] arguments) throws MethodDeclarationException{
+    private void methodArgumentsCheck(String name, String[] arguments) throws MethodDeclarationException, VariableUsageException {
         Method method = getMethodByName(name);
         if (method == null) {
             throw new MethodDeclarationException();
@@ -436,16 +436,21 @@ public class ScopeAnalysis {
      * @param args of the method call
      * @throws MethodDeclarationException if there is no adjustment between arguments
      */
-    private void checkMethodArgumentsOneByOne(List<Variable> variablesOrder, String[] args) throws MethodDeclarationException {
+    private void checkMethodArgumentsOneByOne(List<Variable> variablesOrder, String[] args)
+            throws MethodDeclarationException, VariableUsageException {
         for (int i = 0; i < variablesOrder.size(); i++) {
+            String value = args[i].trim();
             VariableType type = variablesOrder.get(i).getType();
-            Matcher m = Pattern.compile(type.getRegex()).matcher(args[i].trim());
+            Matcher m = Pattern.compile(type.getRegex()).matcher(value);
             if (m.matches()) // in case the argument is constant value
                 continue;
-            Variable globalV = searchVariable(args[i].trim());
+            Variable globalV = searchVariable(value);
             if (globalV == null || !checkAssignedType(globalV.getType(),
                     variablesOrder.get(i).getType())) {
                 throw new MethodDeclarationException(); //to check
+            }
+            if (globalV.getValue() == null){
+                unRecognizedValue(globalV, value);
             }
         }
     }
@@ -462,9 +467,8 @@ public class ScopeAnalysis {
 
     /**
      * check if variable declaration is legal, and add it. (not completed yet)
-     *
      * @param newVarMatcher matcher
-     * @throws Exception (should be a specific exception).
+     * @throws VariableDeclarationException is it is a bad variable declaration
      */
     private void addVariables(Matcher newVarMatcher) throws VariableDeclarationException {
         String finalPrefix = newVarMatcher.group(IS_FINAL);
@@ -513,10 +517,7 @@ public class ScopeAnalysis {
      */
     private boolean assignmentCheck(Variable v, String name){
         Variable other = searchVariable(name);
-        if (other == null || other.getValue() == null ||
-                !checkAssignedType(v.getType(), other.getType()))
-            return false;
-        return true;
+        return (other != null) && (other.getValue() != null) && (checkAssignedType(v.getType(), other.getType()));
     }
 
     /**
@@ -525,12 +526,12 @@ public class ScopeAnalysis {
      */
     private void closedFileChecks() throws VariableDeclarationException , MethodDeclarationException
     {
+        for (String methodName : untRecognizedMethods.keySet()){
+            methodArgumentsCheck(methodName, untRecognizedMethods.get(methodName));
+        }
         for (Variable variable : unRecognizedVariables.keySet()){
             if (!assignmentCheck(variable, unRecognizedVariables.get(variable)))
                 throw new VariableDeclarationException();
-        }
-        for (String methodName : untRecognizedMethods.keySet()){
-            methodArgumentsCheck(methodName, untRecognizedMethods.get(methodName));
         }
     }
 }

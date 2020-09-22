@@ -41,7 +41,7 @@ public class FileAnalysis {
             ScopeAnalysis scopeAnalysis = new ScopeAnalysis();
             scopeAnalysis.Analyze(reader);
             reader.close();
-//            System.out.println(CODE_IS_LEGAL);
+            System.out.println(CODE_IS_LEGAL);
             return CODE_IS_LEGAL;
 
         }
@@ -51,7 +51,7 @@ public class FileAnalysis {
             return IO_ERROR_CODE;
         }
         catch (Exception e){
-//            System.out.println(ILLEGAL_CODE);
+            System.out.println(ILLEGAL_CODE);
             return ILLEGAL_CODE;
         }
     }
