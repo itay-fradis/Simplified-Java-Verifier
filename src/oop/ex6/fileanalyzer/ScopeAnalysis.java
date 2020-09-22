@@ -70,17 +70,20 @@ public class ScopeAnalysis {
          * the scope's methods and variables
          */
         private final Map<String, Variable> variables;
-        private final Map<String, Variable> preVariables;
         private final Map<String, Method> methods;
 
+        /** variables of previous scopes */
+        private final Map<String, Variable> preVariables;
 
         /** all scopes inside a method, has to have access to the method's given args. */
         private final Map<String, Variable> givenMethodVariables;
 
+        /** flag which determines if this scope is inside method or not */
         private boolean isInsideMethod = false;
 
         /**
-         * Scope constructor
+         * scope constructor
+         * @param givenArgs args which given by the new method or if\while statement
          */
         private Scope(Map<String, Variable> givenArgs) {
             variables = new HashMap<>();
@@ -106,9 +109,9 @@ public class ScopeAnalysis {
 
     /**
      * analyze lines in a scope
-     *
      * @param reader - reader of file
      * @throws IOException - when cannot read from file
+     * @throws BadLineFormatException - when encounters code which is not compatible with the sjava requirements.
      */
     public void Analyze(BufferedReader reader) throws IOException, BadLineFormatException {
         String line;
@@ -158,7 +161,6 @@ public class ScopeAnalysis {
                 break;
             default:
                 throw new BadLineFormatException();
-                //case IF:
         }
         scopes.push(new Scope(new HashMap<>()));
     }
@@ -168,6 +170,9 @@ public class ScopeAnalysis {
      * @param arg - arguments in condition
      */
     private void addCondition(String arg) throws BadConditionException {
+        if (!scopes.getFirst().isInsideMethod){
+            throw new BadConditionException();
+        }
         String[] args = arg.split(CONDITION_DELIMITER);
         Pattern p = Pattern.compile(VariableType.BOOLEAN.getRegex());
         for (String str : args) {
@@ -181,7 +186,6 @@ public class ScopeAnalysis {
 
     /**
      * check if it is a valid boolean parameter
-     *
      * @param boolParameter boolean parameter to check
      * @return true if valid, false otherwise
      */

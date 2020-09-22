@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 public class testSjava {
 
     @Test
-    public void test001to49() throws FileNotFoundException {
+    public void test001to49() {
 
         // 1 - 9
         assertEquals(0, Sjavac.main(new String[]{"test001.sjava"}));
@@ -72,7 +72,7 @@ public class testSjava {
     }
 
         @Test
-        public void test050to67() throws FileNotFoundException {
+        public void test050to67() {
 
         // 50 - 59
         assertEquals(0, Sjavac.main(new String[]{"test050.sjava"}));
@@ -98,7 +98,7 @@ public class testSjava {
     }
 
     @Test
-    public void myTest() throws FileNotFoundException {
+    public void myTest() {
         // checks for variations of final
         assertEquals(1, Sjavac.main(new String[]{"mytest01.sjava"}));
         assertEquals(1, Sjavac.main(new String[]{"mytest02.sjava"}));
@@ -122,7 +122,7 @@ public class testSjava {
     }
 
     @Test
-    public void test101to117() throws FileNotFoundException {
+    public void test101to117() {
 
         // 101 - 109
         assertEquals(1, Sjavac.main(new String[]{"test101.sjava"}));
@@ -148,7 +148,7 @@ public class testSjava {
     }
 
     @Test
-    public void test201to300() throws FileNotFoundException {
+    public void test201to300() {
 
         // 201 - 209
         assertEquals(0, Sjavac.main(new String[]{"test201.sjava"}));
@@ -235,7 +235,7 @@ public class testSjava {
     }
 
     @Test
-    public void test300to400() throws FileNotFoundException {
+    public void test300to400() {
 
         // 301 - 309
         assertEquals(0, Sjavac.main(new String[]{"test301.sjava"}));
@@ -248,7 +248,7 @@ public class testSjava {
         assertEquals(1, Sjavac.main(new String[]{"test309.sjava"}));
 
         // 310 - 316
-//        assertEquals(1, Sjavac.main(new String[]{"test310.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test310.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test311.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test312.sjava"}));
         assertEquals(0, Sjavac.main(new String[]{"test313.sjava"}));
@@ -261,7 +261,7 @@ public class testSjava {
     }
 
     @Test
-    public void test400to500() throws FileNotFoundException {
+    public void test400to500() {
 
         // 401 - 409
         assertEquals(1, Sjavac.main(new String[]{"test401.sjava"}));
@@ -339,15 +339,24 @@ public class testSjava {
         assertEquals(1, Sjavac.main(new String[]{"test474.sjava"}));
 
     }
-//
-//    @Test
-//    public void complexTest() throws FileNotFoundException{
-//
-//        // 501 - 505
-//        assertEquals(0, Sjavac.main(new String[]{"test501.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test502.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test503.sjava"}));
-//        assertEquals(1, Sjavac.main(new String[]{"test504.sjava"}));
-//        assertEquals(0, Sjavac.main(new String[]{"test505.sjava"}));
-//    }
+
+    @Test
+    public void complexTest() {
+
+        // 501 - 505
+        assertEquals(0, Sjavac.main(new String[]{"test501.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test502.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test503.sjava"}));
+        assertEquals(1, Sjavac.main(new String[]{"test504.sjava"}));
+        assertEquals(0, Sjavac.main(new String[]{"test505.sjava"}));
+    }
+
+    @Test
+    public void toTest(){
+        assertEquals(0, Sjavac.main(new String[]{"totest14"}));
+        assertEquals(0, Sjavac.main(new String[]{"totest17"}));
+        assertEquals(0, Sjavac.main(new String[]{"totest19"}));
+        assertEquals(0, Sjavac.main(new String[]{"totest24"}));
+        assertEquals(0, Sjavac.main(new String[]{"totest44"}));
+    }
 }

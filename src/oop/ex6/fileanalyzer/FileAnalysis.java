@@ -12,6 +12,15 @@ import java.io.IOException;
  */
 public class FileAnalysis {
 
+    /***/
+    private static final int CODE_IS_LEGAL = 0;
+
+    /***/
+    private static final int ILLEGAL_CODE = 1;
+
+    /***/
+    private static final int IO_ERROR_CODE = 2;
+
     /** IO ERROR MESSAGE */
     private static final String IO_ERR_MSG = "ERROR: IO error occurred";
 
@@ -31,14 +40,19 @@ public class FileAnalysis {
             BufferedReader reader = new BufferedReader(fileReader);
             ScopeAnalysis scopeAnalysis = new ScopeAnalysis();
             scopeAnalysis.Analyze(reader);
-            return 0;
+            reader.close();
+//            System.out.println(CODE_IS_LEGAL);
+            return CODE_IS_LEGAL;
+
         }
         catch (IOException e){
+            System.out.println(IO_ERROR_CODE);
             System.err.println(IO_ERR_MSG);
-            return 2;
+            return IO_ERROR_CODE;
         }
         catch (Exception e){
-            return 1;
+//            System.out.println(ILLEGAL_CODE);
+            return ILLEGAL_CODE;
         }
     }
 
