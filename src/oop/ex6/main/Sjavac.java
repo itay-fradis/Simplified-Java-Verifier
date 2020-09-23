@@ -21,6 +21,7 @@ public class Sjavac {
     /**
      * main method activates the program
      * @param args user arguments
+     * @return output of file analysis program
      */
     public static int main(String[] args) {
         if (args.length != NUM_OF_ARGS){

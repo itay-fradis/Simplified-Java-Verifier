@@ -1,11 +1,9 @@
 package oop.ex6.fileanalyzer;
 
-import oop.ex6.classification.Classifier;
 import oop.ex6.classification.LineClassification;
 import oop.ex6.classification.LineDetails;
 import oop.ex6.classification.LineType;
 import oop.ex6.component.Component;
-import oop.ex6.component.FinalUsageException;
 import oop.ex6.component.VariableDeclarationException;
 import oop.ex6.component.VariableType;
 

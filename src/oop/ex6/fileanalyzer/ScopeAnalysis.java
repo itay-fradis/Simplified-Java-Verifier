@@ -1,7 +1,10 @@
 package oop.ex6.fileanalyzer;
 
 import oop.ex6.classification.*;
-import oop.ex6.component.*;
+import oop.ex6.component.method.Method;
+import oop.ex6.component.method.MethodDeclarationException;
+import oop.ex6.component.method.MethodFactory;
+import oop.ex6.component.variable.*;
 
 import java.io.*;
 import java.util.*;
@@ -34,6 +37,7 @@ public class ScopeAnalysis {
     private static final String METHOD_TYPE = "methodType";
 
     private static final String METHOD_NAME = "methodName";
+
 
     /**
      * a deque of scopes
@@ -81,6 +85,9 @@ public class ScopeAnalysis {
         /** flag which determines if this scope is inside method or not */
         private boolean isInsideMethod = false;
 
+        /***/
+        private boolean isReturnExist = false;
+
         /**
          * scope constructor
          * @param givenArgs args which given by the new method or if\while statement
@@ -120,12 +127,13 @@ public class ScopeAnalysis {
             LineType type = LineClassification.generalClassify(line);
             switch (type) {
                 case NORMAL_LINE:
-                    parseNormalLine(line);
+                    parseNormalLine(line, reader);
                     break;
                 case OPEN_SCOPE_LINE:
                     parseNewScope(line);
                     break;
                 case CLOSED_SCOPE_LINE:
+                    checkSafeExitFromMethod();
                     scopes.pop();
                     break;
                 case COMMENT:
@@ -137,6 +145,18 @@ public class ScopeAnalysis {
         }
         closedFileChecks();
         checkClosingParenthesis();
+    }
+
+    /**
+     *
+     * @throws BadLineFormatException
+     */
+    private void checkSafeExitFromMethod() throws BadLineFormatException {
+        if (scopes.size() == 2){
+            if (!scopes.getFirst().isReturnExist){
+                throw new BadLineFormatException();
+            }
+        }
     }
 
     /**
@@ -222,9 +242,9 @@ public class ScopeAnalysis {
      * creates and add method to scope.
      * @param matcher matcher of line with method-regex
      */
-    private void addMethod(Matcher matcher) throws BadLineFormatException {
+    private void addMethod(Matcher matcher) throws MethodDeclarationException {
         if (scopes.size() > 1) {
-            throw new BadLineFormatException();
+            throw new MethodDeclarationException();
         }
         String mType = matcher.group(METHOD_TYPE);
         String mName = matcher.group(METHOD_NAME);
@@ -250,24 +270,7 @@ public class ScopeAnalysis {
         return null;
     }
 
-    /**
-     * check if variable assigned to is eligible type
-     * @param type - type that value assigned to
-     * @param other - type that should fit our type
-     * @return - true iff assignment is eligible
-     */
-    private boolean checkAssignedType(VariableType type, VariableType other) {
-        if (type == other)
-            return true;
-        switch (type) {
-            case BOOLEAN:
-                return (other == VariableType.INT || other == VariableType.DOUBLE);
-            case DOUBLE:
-                return (other == VariableType.INT);
-            default:
-                return false;
-        }
-    }
+
 
     /**
      * when new variable has an unrecognized value
@@ -301,7 +304,7 @@ public class ScopeAnalysis {
      */
     private void declaredGlobalToAssignLocalVar(Variable globalVariable, Variable variable)
                                                 throws VariableUsageException {
-        if (!checkAssignedType(variable.getType(), globalVariable.getType()))
+        if (!VariableFactory.checkAssignedType(variable.getType(), globalVariable.getType()))
             throw new VariableUsageException();
         if (globalVariable.getValue() == null){
             unRecognizedVariables.put(variable, globalVariable.getName());
@@ -320,7 +323,7 @@ public class ScopeAnalysis {
                                         throws unRecognizedValueException {
         Variable other = searchVariable(value);
         if (other == null || other.getValue() == null ||
-                !checkAssignedType(variable.getType(), other.getType()))
+                !VariableFactory.checkAssignedType(variable.getType(), other.getType()))
             throw new unRecognizedValueException();
         variable.setValue(other.getValue());
     }
@@ -329,7 +332,7 @@ public class ScopeAnalysis {
      * parse normal line which ends with semicolon.
      * @param line line to be parsed
      */
-    private void parseNormalLine(String line) throws BadLineFormatException {
+    private void parseNormalLine(String line, BufferedReader reader) throws BadLineFormatException, IOException {
         LineDetails detailsL = LineClassification.SemiColonClassify(line);
         switch (detailsL.getType()) {
             case NEW_VARIABLE:
@@ -339,6 +342,7 @@ public class ScopeAnalysis {
                 analyzeMethodUsage(detailsL.getMatcher());
                 break;
             case RETURN:
+                returnStatementFunction(reader);
                 break;
             case VARIABLE_ASSIGNMENT:
                 String name = detailsL.getMatcher().group(VARIABLE_NAME);
@@ -351,6 +355,30 @@ public class ScopeAnalysis {
     }
 
     /**
+     * check what happen after return statement
+     * @param reader - reader of file
+     * @throws IOException - when reader problem
+     * @throws ReturnStatementException - if there is no scope closer after return statement
+     */
+    private void returnStatementFunction(BufferedReader reader) throws IOException, ReturnStatementException {
+        if (scopes.size() == 1)
+            throw new ReturnStatementException();
+        String line;
+        scopes.getFirst().isReturnExist = true;
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+            LineType type = LineClassification.generalClassify(line);
+            if (type == LineType.CLOSED_SCOPE_LINE) {
+                scopes.pop();
+                return;
+            }
+            if (type != LineType.COMMENT && type != LineType.EMPTY_LINE)
+                    throw new ReturnStatementException();
+        }
+        throw new ReturnStatementException();
+    }
+
+    /**
      * assign a value to a variable
      * @param name - name of variable
      * @param value - value of variable
@@ -358,7 +386,7 @@ public class ScopeAnalysis {
      */
     private void assignVariables(String name, String value) throws VariableUsageException {
         Variable variable = searchVariable(name);
-        if (variable == null || variable.isFinal())
+        if (variable == null || value == null || variable.isFinal())
             throw new VariableUsageException();
         Pattern p = Pattern.compile(variable.getType().getRegex());
         Matcher m = p.matcher(value);
@@ -370,8 +398,6 @@ public class ScopeAnalysis {
             unRecognizedValue(variable, value);
         else
             throw new unRecognizedValueException();
-
-
     }
 
     /**
@@ -445,13 +471,11 @@ public class ScopeAnalysis {
             if (m.matches()) // in case the argument is constant value
                 continue;
             Variable globalV = searchVariable(value);
-            if (globalV == null || !checkAssignedType(globalV.getType(),
+            if (globalV != null && !VariableFactory.checkAssignedType(globalV.getType(),
                     variablesOrder.get(i).getType())) {
                 throw new MethodDeclarationException(); //to check
             }
-            if (globalV.getValue() == null){
-                unRecognizedValue(globalV, value);
-            }
+            unRecognizedValue(variablesOrder.get(i), value);
         }
     }
 
@@ -517,7 +541,8 @@ public class ScopeAnalysis {
      */
     private boolean assignmentCheck(Variable v, String name){
         Variable other = searchVariable(name);
-        return (other != null) && (other.getValue() != null) && (checkAssignedType(v.getType(), other.getType()));
+        return (other != null) && (other.getValue() != null) &&
+                (VariableFactory.checkAssignedType(v.getType(), other.getType()));
     }
 
     /**

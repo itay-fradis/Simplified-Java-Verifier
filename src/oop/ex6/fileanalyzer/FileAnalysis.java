@@ -33,6 +33,7 @@ public class FileAnalysis {
     /**
      * analyse a file and handle exceptions if there is any
      * @param toRead - file name
+     * @return exit codes , 0 if code passed, 1 if not, 2 for unexpected error
      */
     public static int Analysis(String toRead) {
         try {
@@ -50,7 +51,7 @@ public class FileAnalysis {
             System.err.println(IO_ERR_MSG);
             return IO_ERROR_CODE;
         }
-        catch (Exception e){
+        catch (BadCodeFileException e){
             System.out.println(ILLEGAL_CODE);
             return ILLEGAL_CODE;
         }

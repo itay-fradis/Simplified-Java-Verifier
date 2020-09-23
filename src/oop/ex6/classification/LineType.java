@@ -27,7 +27,9 @@ public enum LineType {
 
     VARIABLE_ASSIGNMENT("(?<variableName>[^;=\\s]+)(\\s*=\\s*(?<variableValue>[^;]+))?;?"),
 
-    METHOD_USAGE("(?<methodName>[^\\s\\(]+)\\s*\\((?<arguments>[^\\)]*)\\);$");
+    METHOD_USAGE("(?<methodName>[^\\s\\(]+)\\s*\\((?<arguments>[^\\)]*)\\);$"),
+
+    BAD_LINE("");
 
 
     /** the regex pattern */

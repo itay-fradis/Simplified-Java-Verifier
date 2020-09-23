@@ -32,12 +32,12 @@ public class LineClassification {
      * @return - line type
      */
     public static LineType generalClassify(String line){
-        for (LineType l : generalTypes){
-            Matcher m = Pattern.compile(l.getRegexPattern()).matcher(line);
-            if (m.find())
-                return l;
+        for (LineType lineType : generalTypes){
+            Matcher matcher = Pattern.compile(lineType.getRegexPattern()).matcher(line);
+            if (matcher.find())
+                return lineType;
         }
-        return null;
+        return LineType.BAD_LINE;
     }
 
     /**
@@ -52,7 +52,7 @@ public class LineClassification {
             if (matcher.matches())
                 return new LineDetails(lineType, matcher);
         }
-        return new LineDetails(null, null);
+        return new LineDetails(LineType.BAD_LINE, null);
 
     }
 
