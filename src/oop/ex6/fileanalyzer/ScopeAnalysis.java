@@ -38,6 +38,8 @@ public class ScopeAnalysis {
 
     private static final String METHOD_NAME = "methodName";
 
+    /** all methods are in scope with index 2 */
+    private static final int METHOD_SCOPE = 2;
 
     /**
      * a deque of scopes
@@ -148,11 +150,11 @@ public class ScopeAnalysis {
     }
 
     /**
-     *
-     * @throws BadLineFormatException
+     * checks if a method has a return statement in its last line.
+     * @throws BadLineFormatException illegal line format and therefore illegal code
      */
     private void checkSafeExitFromMethod() throws BadLineFormatException {
-        if (scopes.size() == 2){
+        if (scopes.size() == METHOD_SCOPE){
             if (!scopes.getFirst().isReturnExist){
                 throw new BadLineFormatException();
             }
@@ -161,7 +163,7 @@ public class ScopeAnalysis {
 
     /**
      * checks if for each open parenthesis there is a close one.
-     * @throws BadLineFormatException
+     * @throws BadLineFormatException illegal line format and therefore illegal code
      */
     private void checkClosingParenthesis() throws BadLineFormatException {
         if (scopes.size() > 1){
@@ -275,7 +277,7 @@ public class ScopeAnalysis {
     /**
      * when new variable has an unrecognized value
      * @param value   - value of new variable
-     * @throws VariableDeclarationException if value is not in correct form
+     * @throws VariableUsageException if value is not in correct form
      */
     private void unRecognizedValue(Variable variable, String value)
             throws VariableUsageException {

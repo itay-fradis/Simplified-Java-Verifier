@@ -7,4 +7,7 @@ import oop.ex6.fileanalyzer.BadLineFormatException;
  */
 public class BadConditionException extends BadLineFormatException {
 
+    /** prevents annoying warning */
+    private static final long serialVersionUID = 1L;
+
 }
